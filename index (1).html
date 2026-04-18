@@ -1,0 +1,2963 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Offerly · 求职申请作战指挥室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --bg: #f5f3ee;
+    --bg-card: #fbfaf6;
+    --bg-elevated: #ffffff;
+    --ink: #1a1a1a;
+    --ink-soft: #4a4a4a;
+    --ink-muted: #8a8680;
+    --line: #e6e2d8;
+    --line-soft: #efece4;
+    --accent: #1a1a1a;
+    --accent-ink: #f5f3ee;
+    --success: #2d5a3d;
+    --success-bg: #e4ede3;
+    --warning: #8a5a1a;
+    --warning-bg: #f3e8d4;
+    --danger: #8a2a2a;
+    --danger-bg: #f3dcdc;
+    --info: #2a4a6a;
+    --info-bg: #dde7ef;
+    --purple: #5a3a7a;
+    --purple-bg: #e8dff0;
+    --shadow-sm: 0 1px 2px rgba(26,26,26,0.04), 0 1px 1px rgba(26,26,26,0.03);
+    --shadow: 0 4px 12px rgba(26,26,26,0.06), 0 2px 4px rgba(26,26,26,0.04);
+    --shadow-lg: 0 12px 32px rgba(26,26,26,0.1), 0 4px 8px rgba(26,26,26,0.05);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: 'Inter Tight', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  .serif { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Layout */
+  .app {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100vh;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: var(--bg-card);
+    border-right: 1px solid var(--line);
+    padding: 24px 16px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 0 12px 32px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    margin-bottom: 20px;
+  }
+  .brand-logo {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: 26px;
+    letter-spacing: -1px;
+    font-style: italic;
+  }
+  .brand-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--danger); display: inline-block;
+    margin-bottom: 4px;
+  }
+  .brand-sub {
+    font-size: 10px;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-left: 2px;
+  }
+  .nav-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ink-muted);
+    padding: 0 12px;
+    margin: 16px 0 8px;
+    font-weight: 500;
+  }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--ink-soft);
+    transition: all 0.15s ease;
+    font-size: 13px;
+    margin-bottom: 2px;
+  }
+  .nav-item:hover { background: var(--line-soft); color: var(--ink); }
+  .nav-item.active {
+    background: var(--ink);
+    color: var(--accent-ink);
+  }
+  .nav-item.active .nav-badge { background: rgba(255,255,255,0.2); color: white; }
+  .nav-icon { width: 16px; height: 16px; flex-shrink: 0; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--line);
+    color: var(--ink-soft);
+    font-size: 11px;
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+
+  /* Main */
+  .main {
+    padding: 28px 40px 40px;
+    max-width: 1600px;
+    width: 100%;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+  .crumb {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+  .topbar-actions { display: flex; gap: 10px; align-items: center; }
+  .page-title {
+    font-family: 'Fraunces', serif;
+    font-size: 40px;
+    font-weight: 500;
+    letter-spacing: -1.5px;
+    margin: 4px 0 6px;
+    line-height: 1.05;
+    font-style: italic;
+  }
+  .page-title em { font-style: italic; font-weight: 500; }
+  .page-sub {
+    color: var(--ink-muted);
+    font-size: 14px;
+    margin-bottom: 28px;
+    max-width: 600px;
+  }
+
+  /* Buttons */
+  .btn {
+    border: 1px solid var(--line);
+    background: var(--bg-elevated);
+    color: var(--ink);
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .btn:hover { border-color: var(--ink); }
+  .btn-primary {
+    background: var(--ink);
+    color: var(--accent-ink);
+    border-color: var(--ink);
+  }
+  .btn-primary:hover { background: #000; }
+  .btn-ghost { background: transparent; border-color: transparent; }
+  .btn-ghost:hover { background: var(--line-soft); border-color: transparent; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-icon { padding: 7px; width: 32px; height: 32px; justify-content: center; }
+
+  /* Stats row */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+  .stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ink-muted);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .stat-value {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    font-weight: 500;
+    letter-spacing: -1.5px;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-delta {
+    font-size: 11px;
+    color: var(--ink-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .stat-delta.positive { color: var(--success); }
+  .stat-delta.negative { color: var(--danger); }
+  .stat-card.featured {
+    background: var(--ink);
+    color: var(--accent-ink);
+    border-color: var(--ink);
+  }
+  .stat-card.featured .stat-label,
+  .stat-card.featured .stat-delta { color: rgba(255,255,255,0.6); }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+    padding-bottom: 0;
+  }
+  .tab {
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .tab:hover { color: var(--ink); }
+  .tab.active {
+    color: var(--ink);
+    border-bottom-color: var(--ink);
+  }
+
+  /* Kanban */
+  .kanban {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    min-height: 500px;
+  }
+  .column {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    min-height: 400px;
+    transition: background 0.15s ease;
+  }
+  .column.drag-over {
+    background: var(--line-soft);
+    border-color: var(--ink);
+  }
+  .col-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 4px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    margin-bottom: 10px;
+  }
+  .col-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .col-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .col-count {
+    font-size: 11px;
+    color: var(--ink-muted);
+    background: var(--line-soft);
+    padding: 1px 7px;
+    border-radius: 10px;
+    font-weight: 600;
+  }
+  .col-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(100vh - 320px);
+    padding: 2px;
+  }
+
+  /* Card */
+  .card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    cursor: grab;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+  .card:hover {
+    border-color: var(--ink);
+    box-shadow: var(--shadow);
+    transform: translateY(-1px);
+  }
+  .card.dragging { opacity: 0.4; cursor: grabbing; }
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+  .card-company {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+  }
+  .company-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 11px;
+    color: white;
+    flex-shrink: 0;
+    font-family: 'Fraunces', serif;
+  }
+  .company-name {
+    font-size: 11px;
+    color: var(--ink-muted);
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .card-role {
+    font-weight: 600;
+    font-size: 13px;
+    line-height: 1.35;
+    margin-bottom: 8px;
+    color: var(--ink);
+  }
+  .card-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+  }
+  .chip {
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 500;
+    letter-spacing: 0.2px;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .chip-success { background: var(--success-bg); color: var(--success); }
+  .chip-warn { background: var(--warning-bg); color: var(--warning); }
+  .chip-danger { background: var(--danger-bg); color: var(--danger); }
+  .chip-info { background: var(--info-bg); color: var(--info); }
+  .chip-purple { background: var(--purple-bg); color: var(--purple); }
+  .chip-muted { background: var(--line-soft); color: var(--ink-muted); }
+
+  .card-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 8px;
+    border-top: 1px solid var(--line-soft);
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+  .deadline {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .deadline.urgent { color: var(--danger); font-weight: 600; }
+  .deadline.soon { color: var(--warning); font-weight: 600; }
+  .progress-mini {
+    display: flex;
+    gap: 2px;
+  }
+  .progress-dot {
+    width: 14px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--line);
+  }
+  .progress-dot.done { background: var(--ink); }
+
+  /* Multi-role indicator */
+  .multi-role-badge {
+    position: absolute;
+    top: -6px;
+    right: 10px;
+    background: var(--purple);
+    color: white;
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  /* Add card */
+  .add-card {
+    border: 1.5px dashed var(--line);
+    background: transparent;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--ink-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    margin-top: 4px;
+  }
+  .add-card:hover {
+    border-color: var(--ink);
+    color: var(--ink);
+    background: var(--bg-elevated);
+  }
+
+  /* Modal */
+  .modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(26,26,26,0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    animation: fadeIn 0.15s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .modal {
+    background: var(--bg-elevated);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 880px;
+    max-height: 90vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    animation: slideUp 0.2s ease;
+  }
+  .modal-head {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-head-content { display: flex; align-items: center; gap: 14px; }
+  .modal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+  }
+  .modal-body {
+    padding: 24px 28px;
+    overflow-y: auto;
+    flex: 1;
+  }
+  .modal-foot {
+    padding: 16px 28px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+  }
+  .modal-close {
+    width: 32px; height: 32px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-muted);
+  }
+  .modal-close:hover { border-color: var(--ink); color: var(--ink); }
+
+  /* Form */
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .form-full { grid-column: 1 / -1; }
+  label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ink-muted);
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 13px;
+    background: var(--bg-elevated);
+    color: var(--ink);
+    transition: border-color 0.15s ease;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--ink);
+  }
+  textarea { resize: vertical; min-height: 70px; }
+
+  /* Interview Room */
+  .interview-room {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 0;
+    height: calc(100vh - 220px);
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .room-side {
+    border-right: 1px solid var(--line);
+    padding: 16px 12px;
+    overflow-y: auto;
+    background: var(--bg-card);
+  }
+  .room-main {
+    padding: 28px 32px;
+    overflow-y: auto;
+    background: var(--bg-elevated);
+  }
+  .room-item {
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+  }
+  .room-item:hover { background: var(--bg-elevated); }
+  .room-item.active {
+    background: var(--bg-elevated);
+    border-color: var(--line);
+  }
+  .room-item-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+  .room-item-role {
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+  .room-item-meta {
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-top: 4px;
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .room-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ink-muted);
+    padding: 0 8px;
+    margin: 4px 0 8px;
+    font-weight: 600;
+  }
+  .interview-section {
+    margin-bottom: 28px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .section-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.3px;
+  }
+  .qa-block {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--info);
+    border-radius: 8px;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .qa-question {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: var(--ink);
+  }
+  .qa-answer {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.6;
+  }
+  .qa-meta {
+    font-size: 10px;
+    color: var(--ink-muted);
+    margin-top: 6px;
+    display: flex;
+    gap: 10px;
+  }
+
+  /* ============ SPREADSHEET VIEW ============ */
+  .sheet-toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .sheet-search {
+    position: relative;
+    flex: 1;
+    min-width: 240px;
+    max-width: 320px;
+  }
+  .sheet-search input {
+    padding-left: 32px;
+    height: 34px;
+    background: var(--bg-elevated);
+  }
+  .sheet-search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--ink-muted);
+    pointer-events: none;
+  }
+  .sheet-filter-chip {
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    transition: all 0.15s ease;
+  }
+  .sheet-filter-chip:hover { border-color: var(--ink); }
+  .sheet-filter-chip.active {
+    background: var(--ink);
+    color: var(--accent-ink);
+    border-color: var(--ink);
+  }
+  .sheet-filter-chip .x-btn {
+    margin-left: 2px;
+    opacity: 0.7;
+    width: 14px; height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+  }
+  .sheet-filter-chip .x-btn:hover { background: rgba(255,255,255,0.2); }
+
+  .sheet-wrap {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .sheet-scroll {
+    overflow: auto;
+    max-height: calc(100vh - 280px);
+    position: relative;
+  }
+  .sheet {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12.5px;
+    min-width: 1200px;
+  }
+  .sheet thead th {
+    background: var(--bg-card);
+    border-bottom: 1.5px solid var(--line);
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--ink);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease;
+  }
+  .sheet thead th:hover { background: var(--line-soft); }
+  .sheet thead th.th-active { background: var(--line-soft); color: var(--ink); }
+
+  .sheet thead th .th-inner {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sheet thead th .th-filter-btn {
+    width: 16px; height: 16px;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ink-muted);
+    opacity: 0.6;
+  }
+  .sheet thead th:hover .th-filter-btn { opacity: 1; }
+  .sheet thead th .th-filter-btn.has-filter {
+    background: var(--ink);
+    color: white;
+    opacity: 1;
+  }
+  .sheet thead th .th-sort {
+    opacity: 0.4;
+    font-size: 10px;
+  }
+  .sheet thead th .th-sort.active { opacity: 1; }
+
+  .sheet tbody td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--line-soft);
+    background: var(--bg-elevated);
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 240px;
+  }
+  .sheet tbody tr:hover td { background: var(--bg-card); }
+  .sheet tbody tr.group-start td { border-top: 2px solid var(--line); }
+
+  /* Frozen first column */
+  .sheet th.col-sticky,
+  .sheet td.col-sticky {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    border-right: 1px solid var(--line);
+  }
+  .sheet thead th.col-sticky { z-index: 4; background: var(--bg-card); }
+  .sheet tbody td.col-sticky { background: var(--bg-elevated); }
+  .sheet tbody tr:hover td.col-sticky { background: var(--bg-card); }
+
+  /* Cell content */
+  .cell-company {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+  }
+  .cell-company .company-logo {
+    width: 22px; height: 22px;
+    font-size: 10px;
+  }
+  .cell-empty { color: var(--ink-muted); font-style: italic; }
+  .cell-link a {
+    color: var(--info);
+    text-decoration: none;
+    font-size: 12px;
+    border-bottom: 1px dotted var(--info);
+  }
+  .cell-link a:hover { border-bottom-style: solid; }
+  .cell-code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: var(--line-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .cell-code:hover { background: var(--ink); color: var(--accent-ink); }
+
+  .cell-input {
+    border: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+    width: 100% !important;
+    font-size: inherit !important;
+    color: inherit !important;
+    font-family: inherit !important;
+    border-radius: 0 !important;
+  }
+  .cell-input:focus {
+    background: white !important;
+    box-shadow: inset 0 0 0 2px var(--ink) !important;
+    padding: 2px 4px !important;
+  }
+
+  /* Filter dropdown */
+  .filter-dropdown {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg);
+    padding: 8px;
+    min-width: 200px;
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 100;
+  }
+  .filter-dropdown-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--line-soft);
+    margin-bottom: 6px;
+  }
+  .filter-dropdown-head strong {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+  .filter-item {
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .filter-item:hover { background: var(--line-soft); }
+  .filter-checkbox {
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .filter-checkbox.checked {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: white;
+  }
+
+  .sheet-footer {
+    padding: 10px 16px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink-muted);
+    background: var(--bg-card);
+  }
+
+  /* Material library */
+  .material-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .material-card {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .material-card:hover { border-color: var(--ink); }
+  .material-icon {
+    width: 36px;
+    height: 44px;
+    border-radius: 4px;
+    background: var(--info-bg);
+    color: var(--info);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 11px;
+    margin-bottom: 10px;
+    position: relative;
+  }
+  .material-icon::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    border-style: solid;
+    border-width: 0 8px 8px 0;
+    border-color: transparent var(--info-bg) transparent transparent;
+  }
+  .material-name {
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  .material-meta {
+    font-size: 11px;
+    color: var(--ink-muted);
+  }
+
+  /* Funnel */
+  .funnel-container {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .funnel {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+  .funnel-stage {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .funnel-bar {
+    height: 44px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    transition: width 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .funnel-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 140px;
+  }
+  .funnel-stage-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .funnel-rate {
+    font-size: 10px;
+    color: var(--ink-muted);
+  }
+
+  /* Calendar */
+  .calendar {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .cal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .cal-title {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.5px;
+  }
+  .cal-nav { display: flex; gap: 6px; }
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+  }
+  .cal-dow {
+    text-align: center;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--ink-muted);
+    padding: 8px 0;
+    font-weight: 600;
+  }
+  .cal-day {
+    aspect-ratio: 1.1;
+    border: 1px solid var(--line-soft);
+    border-radius: 8px;
+    padding: 6px 8px;
+    background: var(--bg-elevated);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-height: 70px;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.15s ease;
+  }
+  .cal-day:hover { border-color: var(--ink); }
+  .cal-day.other-month { opacity: 0.35; }
+  .cal-day.today {
+    background: var(--ink);
+    color: white;
+    border-color: var(--ink);
+  }
+  .cal-date {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+  .cal-event {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--info-bg);
+    color: var(--info);
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cal-event.urgent { background: var(--danger-bg); color: var(--danger); }
+  .cal-event.interview { background: var(--purple-bg); color: var(--purple); }
+  .cal-event.done { background: var(--success-bg); color: var(--success); text-decoration: line-through; opacity: 0.7; }
+
+  /* Company detail */
+  .company-detail {
+    background: var(--bg-card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .rule-box {
+    background: var(--warning-bg);
+    border-left: 3px solid var(--warning);
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--warning);
+  }
+  .rule-box strong { font-weight: 700; }
+  .role-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .role-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+  .role-row-name { font-weight: 600; font-size: 13px; flex: 1; }
+  .role-row-meta { font-size: 11px; color: var(--ink-muted); }
+
+  /* Progress ring */
+  .ring-container {
+    position: relative;
+    width: 60px;
+    height: 60px;
+  }
+  .ring-text {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
+
+  /* Empty state */
+  .empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--ink-muted);
+  }
+  .empty-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .stats-row { grid-template-columns: repeat(3, 1fr); }
+    .kanban { grid-template-columns: repeat(3, 1fr); overflow-x: auto; }
+  }
+  @media (max-width: 768px) {
+    .app { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .main { padding: 16px; }
+    .kanban { grid-template-columns: 1fr; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+    .interview-room { grid-template-columns: 1fr; height: auto; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useMemo, useRef } = React;
+
+// ============ DATA ============
+const STAGES = [
+  { id: 'wishlist', name: '关注中', color: '#8a8680', description: '收藏的意向岗位' },
+  { id: 'applied', name: '已投递', color: '#2a4a6a', description: '简历已投出' },
+  { id: 'test', name: '笔试/OA', color: '#5a3a7a', description: '在线测评阶段' },
+  { id: 'interview', name: '面试中', color: '#8a5a1a', description: '进入面试流程' },
+  { id: 'result', name: '结果', color: '#2d5a3d', description: 'Offer / 感谢信' },
+];
+
+const COMPANY_COLORS = [
+  '#1a1a1a', '#2a4a6a', '#8a5a1a', '#2d5a3d', '#5a3a7a',
+  '#8a2a2a', '#3a5a3a', '#5a4a2a', '#4a3a5a', '#2a5a5a'
+];
+
+const SEED_DATA = {
+  companies: [
+    { id: 'c1', name: '字节跳动', color: '#1a1a1a', logo: '字', industry: '互联网', maxApply: 2, currentApplied: 2, rule: '同一投递周期内最多投递 2 个岗位；全部流程结束后 90 天可重投' },
+    { id: 'c2', name: '腾讯', color: '#2a4a6a', logo: 'T', industry: '互联网', maxApply: 3, currentApplied: 2, rule: '可同时投递 3 个岗位；简历池共享' },
+    { id: 'c3', name: '阿里巴巴', color: '#8a5a1a', logo: '阿', industry: '电商 / 互联网', maxApply: 2, currentApplied: 2, rule: '挂掉一个岗位后立即锁定简历 6 个月' },
+    { id: 'c4', name: '美团', color: '#2d5a3d', logo: '美', industry: '本地生活', maxApply: 1, currentApplied: 1, rule: '当前招聘季仅可投递 1 次' },
+    { id: 'c5', name: '小红书', color: '#8a2a2a', logo: '红', industry: '内容社区', maxApply: 2, currentApplied: 1, rule: '投递间隔需 ≥ 30 天' },
+    { id: 'c6', name: '微软', color: '#2a5a5a', logo: 'M', industry: '科技 / 云服务', maxApply: 5, currentApplied: 1, rule: '投递数量不限，但每个岗位独立评估' },
+    { id: 'c7', name: '滴滴', color: '#4a3a5a', logo: '滴', industry: '互联网 / 出行', maxApply: 3, currentApplied: 1, rule: '同一事业部最多投 1 次，不同事业部可并行' },
+    { id: 'c8', name: '小米', color: '#5a4a2a', logo: '米', industry: '消费电子 / AI', maxApply: 2, currentApplied: 1, rule: 'AI 方向独立投递池' },
+    { id: 'c9', name: '京东', color: '#8a2a4a', logo: '京', industry: '电商', maxApply: 2, currentApplied: 1, rule: '7 天内仅可投递 1 次' },
+    { id: 'c10', name: '蔚来', color: '#3a5a4a', logo: '蔚', industry: '新能源汽车', maxApply: 2, currentApplied: 1, rule: '技术类与业务类分开计数' },
+  ],
+  applications: [
+    { id: 'a1', companyId: 'c1', role: '数据分析师 - 抖音电商', roleType: '数据分析', jobType: '暑期实习', location: '北京', salary: '25-35K', applyDate: '2026-03-28', deadline: '2026-04-25', stage: 'interview', progress: { resume: true, oa: true, hr: true, tech: true, final: false }, priority: 'high', notes: '刘学姐内推', link: 'https://jobs.bytedance.com/campus', referralCode: 'BYTE2026X', jd: '【岗位职责】\n1. 负责抖音电商直播业务的数据分析与洞察，支持 GMV 优化\n2. 搭建业务监控体系，定位增长瓶颈，输出可执行的数据结论\n3. 参与 A/B 实验设计、归因分析、用户分层等专题研究\n\n【任职要求】\n1. 统计学、数学、计算机、商业分析等相关专业在读\n2. 熟练使用 SQL、Python（Pandas/Numpy），熟悉数据可视化工具\n3. 有电商、内容平台相关实习经历优先\n4. 良好的业务 sense，能把数据结论转化为业务建议\n\n【加分项】\n- 有 A/B 实验设计经验\n- 熟悉因果推断基础方法' },
+    { id: 'a2', companyId: 'c1', role: '产品经理 - 国际化产品', roleType: '产品', jobType: '暑期实习', location: '上海', salary: '28-40K', applyDate: '2026-04-02', deadline: '2026-05-03', stage: 'test', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'high', link: 'https://jobs.bytedance.com/campus', referralCode: 'BYTE2026P', jd: '【岗位职责】\n1. 参与 TikTok / CapCut 等国际化产品的功能设计\n2. 做用户研究、竞品分析，输出 PRD\n3. 跟进开发、测试、上线全流程\n\n【任职要求】\n1. 英语流利（可作为工作语言）\n2. 有海外生活或学习经历优先\n3. 对短视频、社交产品有深度理解\n4. 数据驱动，有结构化思维' },
+    { id: 'a3', companyId: 'c2', role: '用户研究员 - WXG', roleType: '用户研究', jobType: '暑期实习', location: '深圳', salary: '22-32K', applyDate: '2026-04-05', deadline: '2026-04-22', stage: 'applied', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'medium', link: 'https://join.qq.com', referralCode: 'TXUR88', jd: '【岗位职责】\n1. 针对微信视频号、公众号等产品开展用户研究\n2. 设计问卷、访谈、可用性测试等研究方案\n3. 输出用户洞察报告，参与产品决策\n\n【任职要求】\n1. 心理学、社会学、传播学、用户体验设计等相关背景\n2. 熟练掌握定性与定量研究方法\n3. 优秀的沟通与报告撰写能力' },
+    { id: 'a4', companyId: 'c2', role: '战略分析师 - CSIG', roleType: '商业分析', jobType: '暑期实习', location: '北京', salary: '30-45K', applyDate: '2026-03-20', deadline: '2026-04-28', stage: 'interview', progress: { resume: true, oa: true, hr: true, tech: false, final: false }, priority: 'high', notes: '学长内推', link: 'https://join.qq.com', referralCode: 'TXCS26', jd: '【岗位职责】\n1. 负责 CSIG 云与智慧产业事业群的战略研究\n2. 跟踪行业动态、竞品动作，输出战略洞察\n3. 协助管理层做重大决策分析\n\n【任职要求】\n1. 顶尖咨询公司、投行实习背景优先\n2. 熟悉 to B 业务模式\n3. 优秀的 Excel / PPT / 数据分析能力\n4. 抗压能力强，可接受项目制高强度工作' },
+    { id: 'a5', companyId: 'c3', role: '商业分析 - 盒马', roleType: '商业分析', jobType: '暑期实习', location: '杭州', salary: '26-38K', applyDate: '2026-04-10', deadline: '2026-05-10', stage: 'wishlist', progress: { resume: false, oa: false, hr: false, tech: false, final: false }, priority: 'medium', link: 'https://talent.alibaba.com', jd: '【岗位职责】\n1. 支持盒马业务的商业分析与决策\n2. 门店运营、品类管理、用户增长等专题分析\n3. 参与业务复盘会议，输出改进建议\n\n【任职要求】\n1. 商学院、工科相关专业\n2. 熟练使用 SQL、Excel、Python\n3. 对新零售、生鲜电商有兴趣\n4. 逻辑清晰，沟通能力强' },
+    { id: 'a6', companyId: 'c4', role: '数据产品经理', roleType: '数据产品', jobType: '校招', location: '北京', salary: '25-35K', applyDate: '2026-03-10', deadline: '2026-04-20', stage: 'result', progress: { resume: true, oa: true, hr: true, tech: true, final: true }, priority: 'high', result: 'offer', notes: '✨ Offer', link: 'https://campus.meituan.com', referralCode: 'MT2026', jd: '【岗位职责】\n1. 负责外卖业务的数据产品规划与设计\n2. 与业务、数据科学团队协作，建设数据分析平台\n3. 推动数据应用落地，提升业务决策效率\n\n【任职要求】\n1. 有产品经理或数据分析实习经验\n2. 熟悉数据仓库、指标体系建设\n3. 能独立完成 PRD 文档撰写' },
+    { id: 'a7', companyId: 'c5', role: '增长策略 - 交易平台', roleType: '增长 / 策略', jobType: '暑期实习', location: '上海', salary: '24-34K', applyDate: '2026-04-08', deadline: '2026-05-05', stage: 'applied', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'medium', link: 'https://job.xiaohongshu.com', jd: '【岗位职责】\n1. 负责小红书电商业务的用户增长策略\n2. 分析用户行为路径，设计增长实验\n3. 与产品、运营、数据团队协作推动实验落地\n\n【任职要求】\n1. 有增长、策略、数据分析相关背景\n2. 熟悉 A/B 测试方法论\n3. 对社区电商有深度理解' },
+    { id: 'a8', companyId: 'c6', role: 'Program Manager Intern', roleType: '产品', jobType: '暑期实习', location: 'Suzhou', salary: '—', applyDate: '2026-03-30', deadline: '2026-04-30', stage: 'test', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'high', notes: '全英文面试准备', link: 'https://careers.microsoft.com', jd: '【Role】\nAs a Program Manager Intern at Microsoft Suzhou, you will work on Azure-related products, driving feature design, cross-team collaboration, and customer engagement.\n\n【Responsibilities】\n- Own feature specs and PRDs\n- Collaborate with engineering and design teams\n- Analyze customer feedback and telemetry data\n\n【Qualifications】\n- Currently pursuing a Bachelor or Master degree\n- Strong analytical and communication skills\n- Fluent English (working language)\n- Interest in cloud computing / enterprise software' },
+    { id: 'a9', companyId: 'c3', role: '算法产品经理 - 钉钉', roleType: '产品', jobType: '校招', location: '杭州', salary: '28-40K', applyDate: '2026-04-01', deadline: '2026-04-19', stage: 'applied', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'high', link: 'https://talent.alibaba.com', referralCode: 'ALG88', jd: '【岗位职责】\n1. 负责钉钉 AI 智能助手相关产品设计\n2. 理解大模型能力边界，定义 AI 产品形态\n3. 推动算法能力在 B 端场景的落地\n\n【任职要求】\n1. 对 LLM、Agent 等前沿方向有深度理解\n2. 有 AI 产品或工具类产品经验优先\n3. 良好的业务理解与抽象能力' },
+    { id: 'a10', companyId: 'c1', role: '商业化策略 - 火山引擎', roleType: '商业分析', jobType: '暑期实习', location: '北京', salary: '30-42K', applyDate: '2026-04-14', deadline: '2026-05-15', stage: 'wishlist', progress: { resume: false, oa: false, hr: false, tech: false, final: false }, priority: 'medium', link: 'https://jobs.bytedance.com', jd: '【岗位职责】\n1. 负责火山引擎 to B 业务的商业化策略\n2. 竞品分析、定价策略、GTM 策略设计\n3. 支持销售团队签约大客户\n\n【任职要求】\n1. 顶尖高校商学院 / 工科背景\n2. 咨询、投行、战略相关实习经验优先\n3. 熟悉云计算、SaaS 行业' },
+    { id: 'a11', companyId: 'c7', role: '数据分析师 - 两轮事业部', roleType: '数据分析', jobType: '暑期实习', location: '北京', salary: '22-30K', applyDate: '2026-03-16', deadline: '2026-04-26', stage: 'applied', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'medium', link: 'https://app.mokahr.com/didichuxing', referralCode: 'DSR5W7Yv', jd: '【岗位职责】\n1. 负责青桔单车、哈啰两轮等业务的数据分析\n2. 车辆调度、用户增长、运营效率等专题分析\n3. 输出数据报告支持业务决策\n\n【任职要求】\n1. 统计、数学、计算机相关背景\n2. 熟练使用 SQL、Python\n3. 对交通出行、共享经济有兴趣' },
+    { id: 'a12', companyId: 'c8', role: '大模型训练与推理 - AI 算法', roleType: '算法', jobType: '暑期实习', location: '北京', salary: '30-45K', applyDate: '2026-03-30', deadline: '2026-05-01', stage: 'test', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'high', link: 'https://xiaomi.jobs.f.mioffice.cn', referralCode: 'NURMEHC', jd: '【岗位职责】\n1. 参与小米大模型（MiLM）的训练与优化\n2. 推理加速、模型量化、端侧部署研究\n3. 跟进前沿论文并复现\n\n【任职要求】\n1. 计算机、AI 相关专业硕士/博士在读\n2. 熟悉 Pytorch、Transformer 架构\n3. 有大模型训练/推理相关项目经验\n4. 发表过顶会论文优先' },
+    { id: 'a13', companyId: 'c9', role: '顶尖人才实习 - 多模态大模型', roleType: '算法', jobType: '暑期实习', location: '北京', salary: '35-50K', applyDate: '2026-03-30', deadline: '2026-05-12', stage: 'applied', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'high', link: 'https://campus.jd.com', referralCode: 'XIAWC6', jd: '【岗位职责】\n1. 参与京东多模态大模型研发（图文、视频理解）\n2. 探索大模型在电商场景的应用（商品理解、智能客服等）\n3. 具身智能方向前沿研究\n\n【任职要求】\n1. 顶尖高校 AI 相关专业博士/硕士\n2. 顶会论文发表经验\n3. 熟悉主流多模态模型架构' },
+    { id: 'a14', companyId: 'c10', role: '算法集成工程师', roleType: '算法', jobType: '暑期实习', location: '上海', salary: '28-38K', applyDate: '2026-03-27', deadline: '2026-04-27', stage: 'applied', progress: { resume: true, oa: false, hr: false, tech: false, final: false }, priority: 'medium', link: 'https://nio.jobs.feishu.cn', referralCode: 'CV6ASCT', jd: '【岗位职责】\n1. 负责蔚来智能驾驶算法的工程集成\n2. 感知、规划、控制等模块的部署与优化\n3. 跟进车端算法上线流程\n\n【任职要求】\n1. 计算机、自动化、车辆工程相关专业\n2. 熟悉 C++、Python\n3. 对自动驾驶有深度兴趣' },
+  ],
+  materials: [
+    { id: 'm1', name: '通用简历-中文 v3.2', type: '简历', format: 'PDF', size: '1.2MB', updated: '2026-04-15', tag: '最新' },
+    { id: 'm2', name: '通用简历-英文 v2.1', type: '简历', format: 'PDF', size: '980KB', updated: '2026-04-10', tag: '' },
+    { id: 'm3', name: '字节跳动-数据岗定制版', type: '简历', format: 'PDF', size: '1.1MB', updated: '2026-04-12', tag: '定制' },
+    { id: 'm4', name: '通用自我介绍（2分钟版）', type: '话术', format: 'DOC', size: '45KB', updated: '2026-04-08', tag: '高频' },
+    { id: 'm5', name: '实习项目：抖音数据分析复盘', type: '项目稿', format: 'DOC', size: '230KB', updated: '2026-04-05', tag: '核心' },
+    { id: 'm6', name: 'STAR 案例库', type: '话术', format: 'DOC', size: '180KB', updated: '2026-04-14', tag: '高频' },
+    { id: 'm7', name: '美团 Cover Letter', type: 'CL', format: 'PDF', size: '320KB', updated: '2026-03-28', tag: '' },
+    { id: 'm8', name: '成绩单扫描件-中英文', type: '证明', format: 'PDF', size: '2.4MB', updated: '2026-03-20', tag: '' },
+  ],
+  resources: [
+    { id: 'r1', name: '27届实习汇总 · offer收割机秘籍', category: '实习汇总', platform: '腾讯文档', url: 'https://docs.qq.com/', description: '每日更新的 27 届实习内推信息汇总，含企业、岗位、投递链接、内推码', tag: '每日更新', pinned: true },
+    { id: 'r2', name: '应届生求职论坛 · 校招专区', category: '求职社区', platform: 'yingjiesheng.com', url: 'https://www.yingjiesheng.com/', description: '老牌校招信息聚合网站，各大厂招聘官网直达', tag: '权威', pinned: true },
+    { id: 'r3', name: '牛客网 · 校招专区', category: '求职社区', platform: 'nowcoder.com', url: 'https://www.nowcoder.com/school/schedule', description: '校招日程表、面经、笔试真题、讨论区', tag: '必看', pinned: true },
+    { id: 'r4', name: '实习僧 · 在校生实习平台', category: '招聘平台', platform: 'shixiseng.com', url: 'https://www.shixiseng.com/', description: '专注在校生实习岗位的招聘平台', tag: '' },
+    { id: 'r5', name: 'BOSS直聘 · 校园招聘', category: '招聘平台', platform: 'zhipin.com', url: 'https://www.zhipin.com/', description: '直接与 HR 沟通，响应快速', tag: '' },
+    { id: 'r6', name: 'LinkedIn · 领英', category: '招聘平台', platform: 'linkedin.com', url: 'https://www.linkedin.com/', description: '外企和海外岗位首选，内推信息丰富', tag: '外企' },
+    { id: 'r7', name: 'LeetCode · 算法题库', category: '笔试/面试准备', platform: 'leetcode.cn', url: 'https://leetcode.cn/', description: '大厂技术面笔试题训练平台', tag: '技术岗' },
+    { id: 'r8', name: 'Glassdoor · 面经/薪资查询', category: '求职社区', platform: 'glassdoor.com', url: 'https://www.glassdoor.com/', description: '全球公司面经和薪资匿名分享', tag: '外企' },
+    { id: 'r9', name: '看准网 · 企业评价', category: '求职社区', platform: 'kanzhun.com', url: 'https://www.kanzhun.com/', description: '企业内部评价、面经、薪资', tag: '' },
+    { id: 'r10', name: '一亩三分地 · 海外求职', category: '求职社区', platform: '1point3acres.com', url: 'https://www.1point3acres.com/', description: '北美求职、留学、H1B 讨论社区', tag: '海外' },
+    { id: 'r11', name: 'PMCaff · 产品经理社区', category: '垂直社区', platform: 'pmcaff.com', url: 'https://www.pmcaff.com/', description: '产品经理学习、求职、内推社区', tag: '产品' },
+    { id: 'r12', name: 'DataCastle · 数据科学社区', category: '垂直社区', platform: 'datacastle.cn', url: 'https://www.datacastle.cn/', description: '数据分析、机器学习竞赛与求职', tag: '数据' },
+  ],
+  interviews: {
+    'a1': {
+      rounds: [
+        { id: 'r1', round: 'HR 初筛', date: '2026-04-10', interviewer: '张 HR', duration: '30min', outcome: 'passed',
+          jd_context: '抖音电商数据分析团队，重点支持直播电商 GMV 优化。团队 12 人，扁平化管理。',
+          questions: [
+            { q: '为什么选择电商方向而不是内容方向？', a: '结合 MSBA 课程中的需求预测项目+个人在跨境电商的实习，回答从供需匹配的兴趣点切入。' },
+            { q: '你最有成就感的数据分析项目？', a: '用了 MGMT 276 的商业分析案例，STAR 结构讲了 A/B 测试复盘。' },
+          ]
+        },
+        { id: 'r2', round: '业务面（一面）', date: '2026-04-14', interviewer: '李组长（数据科学组）', duration: '60min', outcome: 'passed',
+          jd_context: '面试官自我介绍：团队负责直播间 ROI 归因模型，近期在做人货匹配算法的 A/B 实验设计。',
+          questions: [
+            { q: '如果 GMV 突然下跌 20%，你会怎么定位原因？', a: '采用 "用户-商品-场景" 拆解框架，先看流量/转化/客单价三因子，再做用户分群。面试官追问到了辛普森悖论案例。' },
+            { q: 'SQL 现场手写：求近 7 日留存率', a: '用 JOIN 做的，面试官提示可以用窗口函数优化。下次准备时补充练习。' },
+            { q: '反问：团队近期最关注的指标是什么？', a: '面试官说当前最关注 "高价值用户的复购周期缩短"，这是一个重要信号 —— 终面可以往这个方向准备。' },
+          ]
+        },
+        { id: 'r3', round: '技术面（二面）', date: '2026-04-17', interviewer: '王总监', duration: '75min', outcome: 'passed',
+          jd_context: '',
+          questions: [
+            { q: '设计一个衡量 "推荐算法效果" 的北极星指标', a: '提了人均停留时长×转化率的复合指标，但面试官认为忽略了长期留存，需要补一个 T+7 留存率。' },
+          ]
+        },
+      ],
+      pending: { round: '终面（业务 VP）', date: '2026-04-22', time: '下午 3:00', type: '视频面试', location: '飞书会议' },
+      prep_notes: '1. 重点准备 "高价值用户复购" 相关的商业分析框架\n2. 把 MGMTMSA 413 谈判课学到的 BATNA 概念迁移到 "如何说服业务方采纳数据结论"\n3. 终面常问职业规划，准备 3-5 年故事线\n4. 复盘一面 SQL 窗口函数题',
+    },
+    'a4': {
+      rounds: [
+        { id: 'r1', round: 'HR 面', date: '2026-04-12', interviewer: '陈 HR', duration: '25min', outcome: 'passed',
+          jd_context: 'CSIG 战略分析岗，支持 to B 业务的市场进入策略研究。',
+          questions: [
+            { q: '为什么想从数据分析转到战略？', a: '强调了 UCLA MSBA 的产品策略课 MGMT 276 + 谈判课 413 的积累，想要做 "数据驱动的决策" 而不是 "数据本身"。' },
+          ]
+        },
+        { id: 'r2', round: '业务面（一面）', date: '2026-04-16', interviewer: '周经理', duration: '50min', outcome: 'passed',
+          jd_context: '',
+          questions: [
+            { q: 'Case：腾讯云如何在东南亚市场对抗 AWS？', a: '用了 Porter 五力 + 本土化优势的组合框架。面试官补充了 "生态绑定" 的视角。' },
+          ]
+        },
+      ],
+      pending: { round: '终面', date: '2026-04-24', time: '上午 10:00', type: '线下面试', location: '北京海淀腾讯大厦' },
+      prep_notes: '终面是事业群 VP，会考察战略视野。重点准备：\n1. 腾讯近三年财报关键信号\n2. 对 to B 业务 "低毛利+重服务" 模式的理解',
+    },
+  }
+};
+
+// ============ UTILITIES ============
+const daysUntil = (dateStr) => {
+  const target = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  target.setHours(0,0,0,0);
+  return Math.round((target - today) / (1000 * 60 * 60 * 24));
+};
+
+const formatDaysBadge = (days) => {
+  if (days < 0) return { text: `过期 ${-days}天`, className: 'urgent' };
+  if (days === 0) return { text: '今日截止', className: 'urgent' };
+  if (days <= 3) return { text: `${days}天后截止`, className: 'urgent' };
+  if (days <= 7) return { text: `${days}天后截止`, className: 'soon' };
+  return { text: `${days}天后截止`, className: '' };
+};
+
+// ============ ICONS ============
+const Icon = ({ name, size = 16 }) => {
+  const icons = {
+    kanban: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="7" height="18" rx="1"/><rect x="14" y="3" width="7" height="10" rx="1"/></svg>,
+    calendar: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+    building: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="4" y="2" width="16" height="20" rx="1"/><line x1="9" y1="7" x2="9" y2="7"/><line x1="15" y1="7" x2="15" y2="7"/><line x1="9" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="15" y2="12"/></svg>,
+    chat: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+    folder: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>,
+    chart: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>,
+    plus: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    search: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    clock: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+    x: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    chevronLeft: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>,
+    chevronRight: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="9 18 15 12 9 6"/></svg>,
+    check: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="20 6 9 17 4 12"/></svg>,
+    alert: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+    fire: <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 0c-.7 4.2-3.5 5.5-3.5 9 0 1.5.7 3 2 4-2.8 0-5-2.2-5-5 0-1 .3-1.8.7-2.5C5.3 7.3 3 10.4 3 14c0 5 4 10 9 10s9-5 9-10c0-7-7.5-10-7.5-14z"/></svg>,
+    star: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>,
+    table: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/><line x1="15" y1="3" x2="15" y2="21"/></svg>,
+    download: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>,
+    filter: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+    arrowUp: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="18 15 12 9 6 15"/></svg>,
+    arrowDown: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="6 9 12 15 18 9"/></svg>,
+    bookmark: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
+    external: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>,
+    heart: <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+// ============ ROOT ============
+function App() {
+  const DATA_VERSION = 3;
+  const [data, setData] = useState(() => {
+    const saved = localStorage.getItem('offerly-data');
+    const savedVersion = localStorage.getItem('offerly-version');
+    if (saved && savedVersion === String(DATA_VERSION)) {
+      try { return JSON.parse(saved); } catch(e){}
+    }
+    // Fresh install or schema upgrade: use seed data
+    localStorage.setItem('offerly-version', String(DATA_VERSION));
+    return SEED_DATA;
+  });
+  const [view, setView] = useState('board');
+  const [modalApp, setModalApp] = useState(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedInterview, setSelectedInterview] = useState(null);
+
+  useEffect(() => {
+    localStorage.setItem('offerly-data', JSON.stringify(data));
+  }, [data]);
+
+  const interviewApps = data.applications.filter(a => a.stage === 'interview');
+
+  useEffect(() => {
+    if (view === 'interview' && !selectedInterview && interviewApps.length > 0) {
+      setSelectedInterview(interviewApps[0].id);
+    }
+  }, [view, selectedInterview, interviewApps]);
+
+  const updateApp = (id, patch) => {
+    setData(d => ({ ...d, applications: d.applications.map(a => a.id === id ? { ...a, ...patch } : a) }));
+  };
+  const addApp = (newApp) => {
+    setData(d => ({ ...d, applications: [...d.applications, { ...newApp, id: 'a' + Date.now() }] }));
+  };
+  const deleteApp = (id) => {
+    setData(d => ({ ...d, applications: d.applications.filter(a => a.id !== id) }));
+  };
+
+  // Stats
+  const stats = useMemo(() => {
+    const total = data.applications.length;
+    const active = data.applications.filter(a => !['result','wishlist'].includes(a.stage)).length;
+    const interviewing = data.applications.filter(a => a.stage === 'interview').length;
+    const offers = data.applications.filter(a => a.stage === 'result' && a.result === 'offer').length;
+    const urgent = data.applications.filter(a => {
+      if (['result','wishlist'].includes(a.stage)) return false;
+      const d = daysUntil(a.deadline);
+      return d >= 0 && d <= 3;
+    }).length;
+    return { total, active, interviewing, offers, urgent };
+  }, [data.applications]);
+
+  return (
+    <div className="app">
+      <aside className="sidebar">
+        <div className="brand">
+          <span className="brand-logo">Offerly</span>
+          <span className="brand-dot"></span>
+          <span className="brand-sub">'26</span>
+        </div>
+        <div className="nav-label">工作区</div>
+        <div className={`nav-item ${view==='board'?'active':''}`} onClick={()=>setView('board')}>
+          <Icon name="kanban"/> <span>申请看板</span>
+          <span className="nav-badge">{stats.active}</span>
+        </div>
+        <div className={`nav-item ${view==='sheet'?'active':''}`} onClick={()=>setView('sheet')}>
+          <Icon name="table"/> <span>投递汇总</span>
+          <span className="nav-badge">{data.applications.length}</span>
+        </div>
+        <div className={`nav-item ${view==='calendar'?'active':''}`} onClick={()=>setView('calendar')}>
+          <Icon name="calendar"/> <span>日历视图</span>
+          {stats.urgent > 0 && <span className="nav-badge" style={{background: 'var(--danger)', color: 'white'}}>{stats.urgent}</span>}
+        </div>
+        <div className={`nav-item ${view==='companies'?'active':''}`} onClick={()=>setView('companies')}>
+          <Icon name="building"/> <span>公司档案</span>
+          <span className="nav-badge">{data.companies.length}</span>
+        </div>
+        <div className={`nav-item ${view==='interview'?'active':''}`} onClick={()=>setView('interview')}>
+          <Icon name="chat"/> <span>面试进度概览</span>
+          {stats.interviewing > 0 && <span className="nav-badge">{stats.interviewing}</span>}
+        </div>
+        <div className={`nav-item ${view==='materials'?'active':''}`} onClick={()=>setView('materials')}>
+          <Icon name="folder"/> <span>材料库</span>
+          <span className="nav-badge">{data.materials.length}</span>
+        </div>
+        <div className={`nav-item ${view==='resources'?'active':''}`} onClick={()=>setView('resources')}>
+          <Icon name="bookmark"/> <span>资源库</span>
+          <span className="nav-badge">{(data.resources || []).length}</span>
+        </div>
+        <div className={`nav-item ${view==='analytics'?'active':''}`} onClick={()=>setView('analytics')}>
+          <Icon name="chart"/> <span>转化分析</span>
+        </div>
+
+        <div className="nav-label" style={{marginTop: 28}}>本周提醒</div>
+        {data.applications
+          .filter(a => {
+            if (['result','wishlist'].includes(a.stage)) return false;
+            const d = daysUntil(a.deadline);
+            return d >= 0 && d <= 7;
+          })
+          .sort((a,b) => daysUntil(a.deadline) - daysUntil(b.deadline))
+          .slice(0, 3)
+          .map(a => {
+            const company = data.companies.find(c => c.id === a.companyId);
+            const days = daysUntil(a.deadline);
+            return (
+              <div key={a.id} style={{padding: '8px 12px', fontSize: 11, color: 'var(--ink-soft)', borderLeft: '2px solid var(--danger)', marginBottom: 6, marginLeft: 4, cursor: 'pointer'}} onClick={() => setModalApp(a)}>
+                <div style={{fontWeight: 600, color: 'var(--ink)'}}>{company?.name}</div>
+                <div style={{color: 'var(--ink-muted)', marginTop: 2}}>
+                  {days === 0 ? '今日截止' : `${days}天后截止`}
+                </div>
+              </div>
+            );
+          })
+        }
+      </aside>
+
+      <main className="main">
+        {view === 'board' && (
+          <BoardView data={data} setData={setData} stats={stats}
+            onCardClick={setModalApp} onAddClick={() => setAddModalOpen(true)}
+            updateApp={updateApp} />
+        )}
+        {view === 'sheet' && (
+          <SheetView data={data} updateApp={updateApp}
+            onCardClick={setModalApp} onAddClick={() => setAddModalOpen(true)}/>
+        )}
+        {view === 'calendar' && <CalendarView data={data} onCardClick={setModalApp}/>}
+        {view === 'companies' && (
+          <CompaniesView data={data} onCompanyClick={setSelectedCompany}
+            selectedCompany={selectedCompany} onCardClick={setModalApp}/>
+        )}
+        {view === 'interview' && (
+          <InterviewRoom data={data} selectedId={selectedInterview}
+            onSelect={setSelectedInterview} setData={setData}/>
+        )}
+        {view === 'materials' && <MaterialsView data={data} setData={setData}/>}
+        {view === 'resources' && <ResourcesView data={data} setData={setData}/>}
+        {view === 'analytics' && <AnalyticsView data={data}/>}
+      </main>
+
+      {modalApp && (
+        <AppDetailModal app={modalApp} data={data}
+          onClose={() => setModalApp(null)}
+          onUpdate={(patch) => { updateApp(modalApp.id, patch); setModalApp({...modalApp, ...patch}); }}
+          onDelete={() => { deleteApp(modalApp.id); setModalApp(null); }}/>
+      )}
+
+      {addModalOpen && (
+        <AddAppModal data={data} onClose={() => setAddModalOpen(false)}
+          onAdd={(app) => { addApp(app); setAddModalOpen(false); }}/>
+      )}
+    </div>
+  );
+}
+
+// ============ BOARD VIEW ============
+function BoardView({ data, setData, stats, onCardClick, onAddClick, updateApp }) {
+  const [dragOverStage, setDragOverStage] = useState(null);
+  const [draggedId, setDraggedId] = useState(null);
+  const [filter, setFilter] = useState('all');
+
+  const handleDrop = (stage) => {
+    if (draggedId) updateApp(draggedId, { stage });
+    setDraggedId(null);
+    setDragOverStage(null);
+  };
+
+  const filteredApps = useMemo(() => {
+    if (filter === 'all') return data.applications;
+    if (filter === 'urgent') return data.applications.filter(a => {
+      if (['result','wishlist'].includes(a.stage)) return false;
+      const d = daysUntil(a.deadline);
+      return d >= 0 && d <= 7;
+    });
+    if (filter === 'high') return data.applications.filter(a => a.priority === 'high');
+    return data.applications;
+  }, [data.applications, filter]);
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">Dashboard · Spring '26 求职季</div>
+          <h1 className="page-title">申请作战看板</h1>
+        </div>
+        <div className="topbar-actions">
+          <button className="btn" onClick={()=>setFilter(filter === 'urgent' ? 'all' : 'urgent')}>
+            <Icon name="alert" size={13}/> {filter === 'urgent' ? '显示全部' : '仅看紧急'}
+          </button>
+          <button className="btn btn-primary" onClick={onAddClick}>
+            <Icon name="plus" size={13}/> 添加申请
+          </button>
+        </div>
+      </div>
+      <p className="page-sub">将卡片拖拽到不同列以更新状态。点击卡片查看完整详情、流程进度、关联材料。</p>
+
+      <div className="stats-row">
+        <div className="stat-card">
+          <div className="stat-label">总申请数</div>
+          <div className="stat-value">{stats.total}</div>
+          <div className="stat-delta positive">
+            ↑ 本周 +3
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">进行中</div>
+          <div className="stat-value">{stats.active}</div>
+          <div className="stat-delta">排除结果 & 关注</div>
+        </div>
+        <div className="stat-card featured">
+          <div className="stat-label">面试中</div>
+          <div className="stat-value">{stats.interviewing}</div>
+          <div className="stat-delta">★ 重点推进</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">已到手 Offer</div>
+          <div className="stat-value">{stats.offers}</div>
+          <div className="stat-delta positive">转化率 {stats.total ? Math.round(stats.offers/stats.total*100) : 0}%</div>
+        </div>
+        <div className="stat-card" style={{borderColor: stats.urgent > 0 ? 'var(--danger)' : undefined}}>
+          <div className="stat-label">🔥 7 天内紧急</div>
+          <div className="stat-value" style={{color: stats.urgent > 0 ? 'var(--danger)' : undefined}}>{stats.urgent}</div>
+          <div className="stat-delta">{stats.urgent > 0 ? '需要立即处理' : '暂无紧急事项'}</div>
+        </div>
+      </div>
+
+      <div className="kanban">
+        {STAGES.map(stage => {
+          const apps = filteredApps.filter(a => a.stage === stage.id);
+          return (
+            <div key={stage.id}
+              className={`column ${dragOverStage === stage.id ? 'drag-over' : ''}`}
+              onDragOver={(e) => { e.preventDefault(); setDragOverStage(stage.id); }}
+              onDragLeave={() => setDragOverStage(null)}
+              onDrop={() => handleDrop(stage.id)}>
+              <div className="col-header">
+                <div className="col-title">
+                  <span className="col-dot" style={{background: stage.color}}></span>
+                  {stage.name}
+                </div>
+                <span className="col-count">{apps.length}</span>
+              </div>
+              <div className="col-body">
+                {apps.map(app => {
+                  const company = data.companies.find(c => c.id === app.companyId);
+                  const sameCompanyCount = data.applications.filter(a => a.companyId === app.companyId).length;
+                  return (
+                    <ApplicationCard key={app.id} app={app} company={company}
+                      multiRole={sameCompanyCount > 1}
+                      onClick={() => onCardClick(app)}
+                      onDragStart={() => setDraggedId(app.id)}
+                      onDragEnd={() => setDraggedId(null)}
+                      isDragging={draggedId === app.id}/>
+                  );
+                })}
+                {apps.length === 0 && (
+                  <div style={{textAlign:'center', fontSize: 11, color: 'var(--ink-muted)', padding: 24}}>
+                    拖拽卡片到此
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function ApplicationCard({ app, company, multiRole, onClick, onDragStart, onDragEnd, isDragging }) {
+  const days = daysUntil(app.deadline);
+  const badge = formatDaysBadge(days);
+  const progressKeys = ['resume','oa','hr','tech','final'];
+  const progressLabels = {resume:'简历',oa:'笔试',hr:'HR面',tech:'业务面',final:'终面'};
+  const hideDeadline = app.stage === 'result';
+
+  return (
+    <div className={`card ${isDragging ? 'dragging' : ''}`}
+      draggable onClick={onClick}
+      onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      {multiRole && <div className="multi-role-badge">同公司多岗</div>}
+      <div className="card-top">
+        <div className="card-company">
+          <div className="company-logo" style={{background: company.color}}>{company.logo}</div>
+          <div className="company-name">{company.name} · {app.location}</div>
+        </div>
+        {app.priority === 'high' && <Icon name="star" size={12}/>}
+      </div>
+      <div className="card-role">{app.role}</div>
+      <div className="card-meta">
+        <span className="chip chip-muted">{app.salary}</span>
+        {app.result === 'offer' && <span className="chip chip-success">🎉 Offer</span>}
+        {app.notes && app.notes.length < 20 && <span className="chip chip-info">{app.notes}</span>}
+      </div>
+      <div className="card-bottom">
+        {!hideDeadline && (
+          <span className={`deadline ${badge.className}`}>
+            <Icon name="clock" size={11}/> {badge.text}
+          </span>
+        )}
+        {hideDeadline && <span>已完成</span>}
+        <div className="progress-mini">
+          {progressKeys.map(k => (
+            <div key={k} className={`progress-dot ${app.progress[k] ? 'done' : ''}`} title={progressLabels[k]}></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============ SHEET VIEW (INVESTMENT LEDGER) ============
+function SheetView({ data, updateApp, onCardClick, onAddClick }) {
+  const [sortBy, setSortBy] = useState({ key: 'companyId', dir: 'asc' });
+  const [filters, setFilters] = useState({});
+  const [search, setSearch] = useState('');
+  const [openFilter, setOpenFilter] = useState(null);
+  const [editingCell, setEditingCell] = useState(null);
+  const [jdModal, setJdModal] = useState(null);
+
+  // Columns config
+  const COLS = [
+    { key: 'companyId', label: '公司', width: 160, sortable: true, filterable: true, sticky: true, render: (row) => {
+      const c = data.companies.find(cc => cc.id === row.companyId);
+      return <div className="cell-company"><div className="company-logo" style={{background: c.color}}>{c.logo}</div><span>{c.name}</span></div>;
+    }, filterValue: (row) => data.companies.find(c => c.id === row.companyId)?.name },
+    { key: 'industry', label: '行业', width: 120, sortable: true, filterable: true, render: (row) => {
+      const c = data.companies.find(cc => cc.id === row.companyId);
+      return <span className="chip chip-muted">{c?.industry || '—'}</span>;
+    }, filterValue: (row) => data.companies.find(c => c.id === row.companyId)?.industry || '—' },
+    { key: 'role', label: '岗位名称', width: 220, sortable: true, editable: true },
+    { key: 'roleType', label: '岗位类型', width: 110, sortable: true, filterable: true, render: (row) => {
+      const colorMap = { '产品': 'chip-info', '数据分析': 'chip-purple', '商业分析': 'chip-warn', '算法': 'chip-danger', '用户研究': 'chip-success', '数据产品': 'chip-info', '增长 / 策略': 'chip-warn' };
+      return <span className={`chip ${colorMap[row.roleType] || 'chip-muted'}`}>{row.roleType || '未分类'}</span>;
+    } },
+    { key: 'jobType', label: '招聘类型', width: 90, sortable: true, filterable: true, render: (row) => (
+      <span className="chip chip-muted">{row.jobType || '—'}</span>
+    ) },
+    { key: 'location', label: '工作地点', width: 110, sortable: true, filterable: true, editable: true },
+    { key: 'applyDate', label: '投递日期', width: 110, sortable: true, editable: true, type: 'date' },
+    { key: 'deadline', label: '截止日期', width: 110, sortable: true, editable: true, type: 'date', render: (row) => {
+      const days = daysUntil(row.deadline);
+      const urgent = days >= 0 && days <= 3 && !['result','wishlist'].includes(row.stage);
+      return <span style={{color: urgent ? 'var(--danger)' : 'inherit', fontWeight: urgent ? 600 : 400}}>{row.deadline}</span>;
+    } },
+    { key: 'stage', label: '状态', width: 100, sortable: true, filterable: true, render: (row) => {
+      const stage = STAGES.find(s => s.id === row.stage);
+      return <span className="chip" style={{background: stage.color, color: 'white'}}>{stage.name}</span>;
+    }, filterValue: (row) => STAGES.find(s => s.id === row.stage)?.name },
+    { key: 'salary', label: '薪资', width: 90, sortable: true, editable: true },
+    { key: 'jd', label: 'JD', width: 110, render: (row) => (
+      row.jd
+        ? <button className="btn btn-sm" style={{padding: '3px 10px', fontSize: 11}}
+            onClick={(e) => { e.stopPropagation(); setJdModal(row); }}>
+            📄 查看 JD
+          </button>
+        : <span className="cell-empty">—</span>
+    ) },
+    { key: 'link', label: '投递链接', width: 180, render: (row) => (
+      row.link ? <span className="cell-link"><a href={row.link} target="_blank" rel="noopener" onClick={(e) => e.stopPropagation()}>{row.link.replace(/^https?:\/\//, '').slice(0, 24)}{row.link.length > 30 ? '...' : ''}</a></span> : <span className="cell-empty">—</span>
+    ) },
+    { key: 'referralCode', label: '内推码', width: 110, editable: true, render: (row) => (
+      row.referralCode
+        ? <span className="cell-code" title="点击复制" onClick={(e) => {
+            e.stopPropagation();
+            navigator.clipboard && navigator.clipboard.writeText(row.referralCode);
+          }}>{row.referralCode}</span>
+        : <span className="cell-empty">—</span>
+    ) },
+    { key: 'notes', label: '备注', width: 180, editable: true, render: (row) => row.notes || <span className="cell-empty">—</span> },
+  ];
+
+  // Build filter options
+  const filterOptions = useMemo(() => {
+    const opts = {};
+    COLS.filter(c => c.filterable).forEach(col => {
+      const values = new Set();
+      data.applications.forEach(row => {
+        const val = col.filterValue ? col.filterValue(row) : row[col.key];
+        if (val !== undefined && val !== null && val !== '') values.add(val);
+      });
+      opts[col.key] = Array.from(values).sort();
+    });
+    return opts;
+  }, [data]);
+
+  // Filter + search + sort
+  const rows = useMemo(() => {
+    let result = [...data.applications];
+
+    // Search
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(r => {
+        const c = data.companies.find(cc => cc.id === r.companyId);
+        return (
+          (c?.name || '').toLowerCase().includes(q) ||
+          (r.role || '').toLowerCase().includes(q) ||
+          (r.roleType || '').toLowerCase().includes(q) ||
+          (r.location || '').toLowerCase().includes(q) ||
+          (r.notes || '').toLowerCase().includes(q)
+        );
+      });
+    }
+
+    // Filters
+    Object.entries(filters).forEach(([key, selected]) => {
+      if (!selected || selected.length === 0) return;
+      const col = COLS.find(c => c.key === key);
+      result = result.filter(row => {
+        const val = col.filterValue ? col.filterValue(row) : row[key];
+        return selected.includes(val);
+      });
+    });
+
+    // Sort
+    if (sortBy.key) {
+      const col = COLS.find(c => c.key === sortBy.key);
+      result.sort((a, b) => {
+        const av = col?.filterValue ? col.filterValue(a) : a[sortBy.key];
+        const bv = col?.filterValue ? col.filterValue(b) : b[sortBy.key];
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        const r = String(av).localeCompare(String(bv), 'zh');
+        return sortBy.dir === 'asc' ? r : -r;
+      });
+    }
+
+    return result;
+  }, [data, sortBy, filters, search]);
+
+  // Group by company (visual hint) - only when sorted by company
+  const rowsWithGroup = useMemo(() => {
+    if (sortBy.key !== 'companyId') return rows.map(r => ({ row: r, groupStart: false }));
+    let lastCompany = null;
+    return rows.map(r => {
+      const isStart = r.companyId !== lastCompany;
+      lastCompany = r.companyId;
+      return { row: r, groupStart: isStart };
+    });
+  }, [rows, sortBy]);
+
+  const toggleSort = (key) => {
+    if (sortBy.key === key) {
+      setSortBy({ key, dir: sortBy.dir === 'asc' ? 'desc' : 'asc' });
+    } else {
+      setSortBy({ key, dir: 'asc' });
+    }
+  };
+
+  const toggleFilter = (key, value) => {
+    setFilters(f => {
+      const curr = f[key] || [];
+      const next = curr.includes(value) ? curr.filter(v => v !== value) : [...curr, value];
+      return { ...f, [key]: next };
+    });
+  };
+
+  const clearFilter = (key) => {
+    setFilters(f => { const n = {...f}; delete n[key]; return n; });
+  };
+
+  const clearAllFilters = () => { setFilters({}); setSearch(''); };
+  const activeFilterCount = Object.values(filters).filter(v => v && v.length > 0).length;
+
+  const exportCSV = () => {
+    const headers = COLS.map(c => c.label);
+    const rowsData = rows.map(row =>
+      COLS.map(col => {
+        if (col.key === 'companyId') return data.companies.find(c => c.id === row.companyId)?.name || '';
+        if (col.key === 'industry') return data.companies.find(c => c.id === row.companyId)?.industry || '';
+        if (col.key === 'stage') return STAGES.find(s => s.id === row.stage)?.name || '';
+        return row[col.key] || '';
+      })
+    );
+    const csv = [headers, ...rowsData].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `求职投递总账_${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleCellEdit = (rowId, key, value) => {
+    updateApp(rowId, { [key]: value });
+    setEditingCell(null);
+  };
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">Dashboard · 投递明细</div>
+          <h1 className="page-title">投递汇总</h1>
+        </div>
+        <div className="topbar-actions">
+          <button className="btn" onClick={exportCSV}><Icon name="download" size={13}/> 导出 CSV</button>
+          <button className="btn btn-primary" onClick={onAddClick}><Icon name="plus" size={13}/> 添加投递</button>
+        </div>
+      </div>
+      <p className="page-sub">类 Excel 表格视图 · 点击列头排序 · 列头筛选图标多选筛选 · 双击单元格直接编辑 · 按公司分组</p>
+
+      <div className="sheet-toolbar">
+        <div className="sheet-search">
+          <span className="sheet-search-icon"><Icon name="search" size={14}/></span>
+          <input type="text" placeholder="搜索公司、岗位、地点、备注..." value={search} onChange={(e) => setSearch(e.target.value)}/>
+        </div>
+        {activeFilterCount > 0 && (
+          <button className="sheet-filter-chip active" onClick={clearAllFilters}>
+            清除 {activeFilterCount} 个筛选 <span className="x-btn"><Icon name="x" size={10}/></span>
+          </button>
+        )}
+        {Object.entries(filters).map(([key, vals]) => {
+          if (!vals || vals.length === 0) return null;
+          const col = COLS.find(c => c.key === key);
+          return (
+            <div key={key} className="sheet-filter-chip active">
+              {col.label}: {vals.length > 1 ? `${vals[0]} +${vals.length - 1}` : vals[0]}
+              <span className="x-btn" onClick={(e) => { e.stopPropagation(); clearFilter(key); }}><Icon name="x" size={10}/></span>
+            </div>
+          );
+        })}
+        <span style={{marginLeft: 'auto', fontSize: 12, color: 'var(--ink-muted)'}}>
+          共 <strong style={{color: 'var(--ink)'}}>{rows.length}</strong> / {data.applications.length} 条
+        </span>
+      </div>
+
+      <div className="sheet-wrap">
+        <div className="sheet-scroll">
+          <table className="sheet">
+            <thead>
+              <tr>
+                {COLS.map(col => (
+                  <th key={col.key} style={{width: col.width, minWidth: col.width}}
+                    className={`${col.sticky ? 'col-sticky' : ''} ${sortBy.key === col.key ? 'th-active' : ''}`}
+                    onClick={() => col.sortable && toggleSort(col.key)}>
+                    <div className="th-inner">
+                      <span>{col.label}</span>
+                      {col.sortable && sortBy.key === col.key && (
+                        <span className="th-sort active">
+                          <Icon name={sortBy.dir === 'asc' ? 'arrowUp' : 'arrowDown'} size={10}/>
+                        </span>
+                      )}
+                      {col.filterable && (
+                        <span className={`th-filter-btn ${filters[col.key]?.length > 0 ? 'has-filter' : ''}`}
+                          onClick={(e) => { e.stopPropagation(); setOpenFilter(openFilter === col.key ? null : col.key); }}>
+                          <Icon name="filter" size={10}/>
+                        </span>
+                      )}
+                    </div>
+                    {openFilter === col.key && (
+                      <FilterDropdown
+                        options={filterOptions[col.key]}
+                        selected={filters[col.key] || []}
+                        onToggle={(v) => toggleFilter(col.key, v)}
+                        onClear={() => clearFilter(col.key)}
+                        onClose={() => setOpenFilter(null)}
+                      />
+                    )}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rowsWithGroup.map(({ row, groupStart }) => (
+                <tr key={row.id} className={groupStart ? 'group-start' : ''} onClick={() => onCardClick(row)} style={{cursor: 'pointer'}}>
+                  {COLS.map(col => {
+                    const cellKey = row.id + '-' + col.key;
+                    const isEditing = editingCell === cellKey;
+                    return (
+                      <td key={col.key}
+                        className={col.sticky ? 'col-sticky' : ''}
+                        style={{width: col.width, minWidth: col.width}}
+                        onDoubleClick={(e) => { if (col.editable) { e.stopPropagation(); setEditingCell(cellKey); } }}>
+                        {isEditing ? (
+                          <input className="cell-input"
+                            type={col.type || 'text'}
+                            defaultValue={row[col.key] || ''}
+                            autoFocus
+                            onClick={(e) => e.stopPropagation()}
+                            onBlur={(e) => handleCellEdit(row.id, col.key, e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') e.target.blur();
+                              if (e.key === 'Escape') setEditingCell(null);
+                            }}/>
+                        ) : (
+                          col.render ? col.render(row) : (row[col.key] || <span className="cell-empty">—</span>)
+                        )}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+              {rows.length === 0 && (
+                <tr><td colSpan={COLS.length} style={{textAlign: 'center', padding: 40, color: 'var(--ink-muted)'}}>
+                  没有匹配的结果 · <span style={{color: 'var(--ink)', cursor: 'pointer', textDecoration: 'underline'}} onClick={clearAllFilters}>清除筛选</span>
+                </td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+        <div className="sheet-footer">
+          <span>💡 小技巧：点击列头排序 · 筛选图标多选筛选 · 双击单元格直接编辑 · 单击行打开详情</span>
+          <span>按公司分组：{sortBy.key === 'companyId' ? '✓ 已启用' : '点击「公司」列头启用'}</span>
+        </div>
+      </div>
+
+      {jdModal && <JdModal app={jdModal} company={data.companies.find(c => c.id === jdModal.companyId)} onClose={() => setJdModal(null)}/>}
+    </>
+  );
+}
+
+function JdModal({ app, company, onClose }) {
+  const copyJd = () => {
+    navigator.clipboard && navigator.clipboard.writeText(app.jd);
+  };
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} style={{maxWidth: 680}}>
+        <div className="modal-head">
+          <div className="modal-head-content">
+            <div className="company-logo" style={{background: company.color, width: 36, height: 36, fontSize: 14}}>{company.logo}</div>
+            <div>
+              <div style={{fontSize: 11, color: 'var(--ink-muted)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: 1}}>Job Description · {company.name}</div>
+              <div className="modal-title">{app.role}</div>
+            </div>
+          </div>
+          <button className="modal-close" onClick={onClose}><Icon name="x" size={14}/></button>
+        </div>
+        <div className="modal-body">
+          <div style={{display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16, paddingBottom: 16, borderBottom: '1px solid var(--line-soft)'}}>
+            {app.roleType && <span className="chip chip-info">{app.roleType}</span>}
+            {app.jobType && <span className="chip chip-muted">{app.jobType}</span>}
+            {app.location && <span className="chip chip-muted">📍 {app.location}</span>}
+            {app.salary && app.salary !== '—' && <span className="chip chip-success">💰 {app.salary}</span>}
+            {app.deadline && <span className="chip chip-warn">⏰ 截止 {app.deadline}</span>}
+          </div>
+          <div style={{whiteSpace: 'pre-wrap', fontSize: 13, lineHeight: 1.8, color: 'var(--ink-soft)', fontFamily: 'Inter Tight, sans-serif'}}>
+            {app.jd}
+          </div>
+          {app.link && (
+            <div style={{marginTop: 20, padding: 12, background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--line)'}}>
+              <div style={{fontSize: 10, textTransform: 'uppercase', letterSpacing: 1.5, color: 'var(--ink-muted)', fontWeight: 600, marginBottom: 4}}>投递链接</div>
+              <a href={app.link} target="_blank" rel="noopener" style={{color: 'var(--info)', fontSize: 12, wordBreak: 'break-all'}}>{app.link}</a>
+              {app.referralCode && (
+                <div style={{marginTop: 8, fontSize: 11, color: 'var(--ink-muted)'}}>
+                  内推码：<span className="cell-code">{app.referralCode}</span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="modal-foot">
+          <button className="btn" onClick={copyJd}>复制 JD</button>
+          <button className="btn btn-primary" onClick={onClose}>关闭</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FilterDropdown({ options, selected, onToggle, onClear, onClose }) {
+  const ref = useRef(null);
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose(); };
+    setTimeout(() => document.addEventListener('click', handler), 0);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+  return (
+    <div className="filter-dropdown" ref={ref} onClick={(e) => e.stopPropagation()} style={{top: 'calc(100% + 4px)', left: 0}}>
+      <div className="filter-dropdown-head">
+        <strong>筛选</strong>
+        <button className="btn btn-sm btn-ghost" onClick={onClear} style={{padding: '2px 6px', fontSize: 10}}>清除</button>
+      </div>
+      {options.map(opt => (
+        <div key={opt} className="filter-item" onClick={() => onToggle(opt)}>
+          <span className={`filter-checkbox ${selected.includes(opt) ? 'checked' : ''}`}>
+            {selected.includes(opt) && <Icon name="check" size={10}/>}
+          </span>
+          <span>{opt}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ============ CALENDAR VIEW ============
+function CalendarView({ data, onCardClick }) {
+  const [cursor, setCursor] = useState(new Date());
+  const year = cursor.getFullYear();
+  const month = cursor.getMonth();
+  const firstDay = new Date(year, month, 1);
+  const startDow = firstDay.getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+  const cells = [];
+  for (let i = startDow - 1; i >= 0; i--) {
+    cells.push({ date: daysInPrevMonth - i, otherMonth: true, realDate: new Date(year, month - 1, daysInPrevMonth - i) });
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    cells.push({ date: d, otherMonth: false, realDate: new Date(year, month, d) });
+  }
+  while (cells.length < 42) {
+    const d = cells.length - startDow - daysInMonth + 1;
+    cells.push({ date: d, otherMonth: true, realDate: new Date(year, month + 1, d) });
+  }
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const eventsOnDay = (date) => {
+    const dateStr = date.toISOString().slice(0, 10);
+    const deadlines = data.applications.filter(a => a.deadline === dateStr);
+    const interviewEvents = [];
+    Object.entries(data.interviews || {}).forEach(([appId, info]) => {
+      if (info.pending && info.pending.date === dateStr) {
+        const app = data.applications.find(a => a.id === appId);
+        if (app) interviewEvents.push({ ...info.pending, app, isInterview: true });
+      }
+    });
+    return { deadlines, interviewEvents };
+  };
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">Dashboard · 时间线</div>
+          <h1 className="page-title">截止日历</h1>
+        </div>
+        <div className="topbar-actions">
+          <button className="btn btn-sm" onClick={() => setCursor(new Date())}>回到今天</button>
+        </div>
+      </div>
+      <p className="page-sub">月历视图 · 红色 = 投递截止 · 紫色 = 面试日程 · 点击事件查看详情</p>
+
+      <div className="calendar">
+        <div className="cal-head">
+          <h2 className="cal-title">
+            {year} 年 {month + 1} 月
+          </h2>
+          <div className="cal-nav">
+            <button className="btn btn-icon" onClick={() => setCursor(new Date(year, month - 1, 1))}>
+              <Icon name="chevronLeft" size={14}/>
+            </button>
+            <button className="btn btn-icon" onClick={() => setCursor(new Date(year, month + 1, 1))}>
+              <Icon name="chevronRight" size={14}/>
+            </button>
+          </div>
+        </div>
+        <div className="cal-grid">
+          {['日','一','二','三','四','五','六'].map(d => (
+            <div key={d} className="cal-dow">{d}</div>
+          ))}
+          {cells.map((cell, i) => {
+            const { deadlines, interviewEvents } = eventsOnDay(cell.realDate);
+            const isToday = cell.realDate.getTime() === today.getTime();
+            return (
+              <div key={i} className={`cal-day ${cell.otherMonth ? 'other-month' : ''} ${isToday ? 'today' : ''}`}>
+                <div className="cal-date">{cell.date}</div>
+                {deadlines.slice(0, 2).map(app => {
+                  const company = data.companies.find(c => c.id === app.companyId);
+                  const isDone = app.stage === 'result';
+                  const daysLeft = daysUntil(app.deadline);
+                  const cls = isDone ? 'done' : (daysLeft <= 3 ? 'urgent' : '');
+                  return (
+                    <div key={app.id} className={`cal-event ${cls}`} onClick={(e) => { e.stopPropagation(); onCardClick(app); }}>
+                      {company?.name.slice(0,2)} · {app.role.slice(0,6)}
+                    </div>
+                  );
+                })}
+                {interviewEvents.slice(0, 1).map((ev, idx) => {
+                  const company = data.companies.find(c => c.id === ev.app.companyId);
+                  return (
+                    <div key={idx} className="cal-event interview" onClick={(e) => { e.stopPropagation(); onCardClick(ev.app); }}>
+                      面试 · {company?.name}
+                    </div>
+                  );
+                })}
+                {deadlines.length + interviewEvents.length > 3 && (
+                  <div className="cal-event chip-muted">+{deadlines.length + interviewEvents.length - 3}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ============ COMPANIES VIEW ============
+function CompaniesView({ data, selectedCompany, onCompanyClick, onCardClick }) {
+  const company = selectedCompany ? data.companies.find(c => c.id === selectedCompany) : null;
+
+  if (!company) {
+    return (
+      <>
+        <div className="topbar">
+          <div>
+            <div className="crumb">Dashboard · 公司维度</div>
+            <h1 className="page-title">公司档案</h1>
+          </div>
+        </div>
+        <p className="page-sub">按公司聚合查看。同一公司的多岗位投递、投递规则、历史投递记录尽在掌握。</p>
+
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14}}>
+          {data.companies.map(c => {
+            const roles = data.applications.filter(a => a.companyId === c.id);
+            const interviewing = roles.filter(r => r.stage === 'interview').length;
+            const offers = roles.filter(r => r.result === 'offer').length;
+            const remainingApplies = c.maxApply - c.currentApplied;
+            return (
+              <div key={c.id} className="stat-card" style={{cursor:'pointer', padding: 18}} onClick={() => onCompanyClick(c.id)}>
+                <div style={{display: 'flex', gap: 12, alignItems: 'center', marginBottom: 14}}>
+                  <div className="company-logo" style={{background: c.color, width: 40, height: 40, fontSize: 16}}>{c.logo}</div>
+                  <div>
+                    <div style={{fontWeight: 700, fontSize: 15, fontFamily: 'Fraunces, serif'}}>{c.name}</div>
+                    <div style={{fontSize: 11, color: 'var(--ink-muted)', marginTop: 2}}>{roles.length} 个投递</div>
+                  </div>
+                </div>
+                <div style={{display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 12}}>
+                  {interviewing > 0 && <span className="chip chip-warn">面试中 {interviewing}</span>}
+                  {offers > 0 && <span className="chip chip-success">🎉 Offer {offers}</span>}
+                  <span className={`chip ${remainingApplies > 0 ? 'chip-info' : 'chip-danger'}`}>
+                    {remainingApplies > 0 ? `还可投 ${remainingApplies} 次` : '已达上限'}
+                  </span>
+                </div>
+                <div style={{fontSize: 11, color: 'var(--ink-muted)', lineHeight: 1.5, borderTop: '1px solid var(--line-soft)', paddingTop: 10}}>
+                  {c.rule}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </>
+    );
+  }
+
+  const roles = data.applications.filter(a => a.companyId === company.id);
+  const remainingApplies = company.maxApply - company.currentApplied;
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">
+            <span style={{cursor: 'pointer'}} onClick={() => onCompanyClick(null)}>公司档案</span>
+            {' / '}{company.name}
+          </div>
+          <h1 className="page-title" style={{display: 'flex', alignItems: 'center', gap: 14}}>
+            <div className="company-logo" style={{background: company.color, width: 48, height: 48, fontSize: 20}}>{company.logo}</div>
+            {company.name}
+          </h1>
+        </div>
+        <button className="btn" onClick={() => onCompanyClick(null)}>← 返回列表</button>
+      </div>
+
+      <div className="company-detail">
+        <div className="rule-box">
+          <strong>投递规则：</strong>{company.rule}
+        </div>
+
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 20}}>
+          <div>
+            <div className="stat-label">已投递</div>
+            <div style={{fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600}}>{company.currentApplied} / {company.maxApply}</div>
+          </div>
+          <div>
+            <div className="stat-label">面试中</div>
+            <div style={{fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600}}>{roles.filter(r => r.stage === 'interview').length}</div>
+          </div>
+          <div>
+            <div className="stat-label">剩余投递机会</div>
+            <div style={{fontFamily: 'Fraunces, serif', fontSize: 28, fontWeight: 600, color: remainingApplies === 0 ? 'var(--danger)' : 'var(--success)'}}>
+              {remainingApplies}
+            </div>
+          </div>
+        </div>
+
+        <h3 className="section-title" style={{marginBottom: 12}}>投递岗位列表</h3>
+        <div className="role-list">
+          {roles.map(r => {
+            const stage = STAGES.find(s => s.id === r.stage);
+            return (
+              <div key={r.id} className="role-row" onClick={() => onCardClick(r)} style={{cursor: 'pointer'}}>
+                <span className="col-dot" style={{background: stage.color, width: 10, height: 10}}></span>
+                <div style={{flex: 1}}>
+                  <div className="role-row-name">{r.role}</div>
+                  <div className="role-row-meta">{r.location} · {r.salary}</div>
+                </div>
+                <span className="chip chip-muted">{stage.name}</span>
+                {r.result === 'offer' && <span className="chip chip-success">Offer</span>}
+              </div>
+            );
+          })}
+          {remainingApplies > 0 && (
+            <div style={{padding: 14, border: '1.5px dashed var(--line)', borderRadius: 8, textAlign: 'center', fontSize: 12, color: 'var(--ink-muted)'}}>
+              💡 该公司还可投递 <strong style={{color: 'var(--success)'}}>{remainingApplies}</strong> 个岗位 —— 建议探索备选岗位以最大化机会
+            </div>
+          )}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ============ INTERVIEW ROOM ============
+function InterviewRoom({ data, selectedId, onSelect, setData }) {
+  const interviewApps = data.applications.filter(a => a.stage === 'interview');
+  const current = interviewApps.find(a => a.id === selectedId) || interviewApps[0];
+  const interviewData = current ? (data.interviews || {})[current.id] : null;
+
+  const addQuestion = () => {
+    const q = prompt('输入面试问题：');
+    if (!q) return;
+    const a = prompt('输入你的回答要点（可留空）：') || '';
+    setData(d => {
+      const interviews = { ...(d.interviews || {}) };
+      if (!interviews[current.id]) interviews[current.id] = { rounds: [], pending: null, prep_notes: '' };
+      const rounds = interviews[current.id].rounds;
+      const lastRound = rounds[rounds.length - 1];
+      if (lastRound) {
+        lastRound.questions = [...(lastRound.questions || []), { q, a }];
+      }
+      return { ...d, interviews };
+    });
+  };
+
+  if (!current) {
+    return (
+      <>
+        <div className="topbar">
+          <div>
+            <div className="crumb">Dashboard · 面试管理</div>
+            <h1 className="page-title">面试进度概览</h1>
+          </div>
+        </div>
+        <div className="empty">
+          <div className="empty-title">暂无进行中的面试</div>
+          <div>当有岗位进入"面试中"阶段，这里会为每个岗位生成独立工作区</div>
+        </div>
+      </>
+    );
+  }
+
+  const company = data.companies.find(c => c.id === current.companyId);
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">Dashboard · 面试管理</div>
+          <h1 className="page-title">面试进度概览</h1>
+        </div>
+      </div>
+      <p className="page-sub">每个进面岗位独立工作区 · 沉淀 JD 情报、面试官问题、复盘要点、备战材料</p>
+
+      <div className="interview-room">
+        <div className="room-side">
+          <div className="room-label">进行中的面试</div>
+          {interviewApps.map(app => {
+            const c = data.companies.find(cc => cc.id === app.companyId);
+            const iv = (data.interviews || {})[app.id];
+            return (
+              <div key={app.id} className={`room-item ${current.id === app.id ? 'active' : ''}`} onClick={() => onSelect(app.id)}>
+                <div className="room-item-head">
+                  <div className="company-logo" style={{background: c.color, width: 20, height: 20, fontSize: 10}}>{c.logo}</div>
+                  <span style={{fontSize: 11, color: 'var(--ink-muted)'}}>{c.name}</span>
+                </div>
+                <div className="room-item-role">{app.role}</div>
+                <div className="room-item-meta">
+                  <span>{iv?.rounds?.length || 0} 轮已完成</span>
+                  {iv?.pending && <span className="chip chip-warn" style={{padding: '1px 5px', fontSize: 9}}>{iv.pending.date}</span>}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="room-main">
+          <div style={{display: 'flex', alignItems: 'center', gap: 14, marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid var(--line)'}}>
+            <div className="company-logo" style={{background: company.color, width: 44, height: 44, fontSize: 17}}>{company.logo}</div>
+            <div>
+              <h2 style={{fontFamily: 'Fraunces, serif', fontSize: 26, fontWeight: 500, letterSpacing: -0.5, lineHeight: 1.1}}>{current.role}</h2>
+              <div style={{fontSize: 12, color: 'var(--ink-muted)', marginTop: 4}}>{company.name} · {current.location} · {current.salary}</div>
+            </div>
+          </div>
+
+          {interviewData?.pending && (
+            <div style={{background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)', color: 'white', padding: 20, borderRadius: 12, marginBottom: 28}}>
+              <div style={{fontSize: 10, textTransform: 'uppercase', letterSpacing: 1.5, opacity: 0.6, fontWeight: 600, marginBottom: 4}}>下一轮面试</div>
+              <div style={{fontFamily: 'Fraunces, serif', fontSize: 22, fontWeight: 500, marginBottom: 8}}>{interviewData.pending.round}</div>
+              <div style={{display: 'flex', gap: 20, fontSize: 12}}>
+                <span>📅 {interviewData.pending.date} {interviewData.pending.time}</span>
+                <span>📍 {interviewData.pending.location}</span>
+                <span>💻 {interviewData.pending.type}</span>
+              </div>
+            </div>
+          )}
+
+          {interviewData?.prep_notes && (
+            <div className="interview-section">
+              <div className="section-header">
+                <h3 className="section-title">备战要点</h3>
+              </div>
+              <div style={{background: 'var(--bg-card)', padding: 16, borderRadius: 10, fontSize: 13, lineHeight: 1.7, whiteSpace: 'pre-wrap', border: '1px solid var(--line)'}}>
+                {interviewData.prep_notes}
+              </div>
+            </div>
+          )}
+
+          <div className="interview-section">
+            <div className="section-header">
+              <h3 className="section-title">面试轮次复盘</h3>
+              <button className="btn btn-sm" onClick={addQuestion}>+ 记录新问题</button>
+            </div>
+            {interviewData?.rounds?.map(round => (
+              <div key={round.id} style={{marginBottom: 24}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10}}>
+                  <span style={{fontWeight: 700, fontSize: 13}}>{round.round}</span>
+                  <span className="chip chip-success">✓ 通过</span>
+                  <span style={{fontSize: 11, color: 'var(--ink-muted)'}}>{round.date} · {round.interviewer} · {round.duration}</span>
+                </div>
+                {round.jd_context && (
+                  <div style={{background: 'var(--info-bg)', color: 'var(--info)', padding: 10, borderRadius: 6, fontSize: 11, marginBottom: 10, lineHeight: 1.5}}>
+                    <strong>🎯 面试官透露的 JD 情报：</strong> {round.jd_context}
+                  </div>
+                )}
+                {round.questions?.map((qa, i) => (
+                  <div key={i} className="qa-block">
+                    <div className="qa-question">Q{i+1}. {qa.q}</div>
+                    <div className="qa-answer">{qa.a}</div>
+                  </div>
+                ))}
+              </div>
+            )) || <div className="empty">暂无面试记录</div>}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ============ MATERIALS VIEW ============
+function MaterialsView({ data, setData }) {
+  const [filter, setFilter] = useState('全部');
+  const types = ['全部', ...new Set(data.materials.map(m => m.type))];
+  const filtered = filter === '全部' ? data.materials : data.materials.filter(m => m.type === filter);
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">Dashboard · 资源中心</div>
+          <h1 className="page-title">材料库</h1>
+        </div>
+        <div className="topbar-actions">
+          <button className="btn btn-primary"><Icon name="plus" size={13}/> 上传材料</button>
+        </div>
+      </div>
+      <p className="page-sub">简历多版本、自我介绍话术、实习项目文档、STAR 案例库 —— 一处沉淀，随时调用</p>
+
+      <div className="tabs">
+        {types.map(t => (
+          <div key={t} className={`tab ${filter === t ? 'active' : ''}`} onClick={() => setFilter(t)}>
+            {t} <span style={{fontSize: 10, color: 'var(--ink-muted)', fontWeight: 500}}>{t === '全部' ? data.materials.length : data.materials.filter(m => m.type === t).length}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="material-grid">
+        {filtered.map(m => (
+          <div key={m.id} className="material-card">
+            <div className="material-icon" style={{
+              background: m.type === '简历' ? 'var(--info-bg)' : m.type === '话术' ? 'var(--purple-bg)' : m.type === '项目稿' ? 'var(--success-bg)' : m.type === 'CL' ? 'var(--warning-bg)' : 'var(--line-soft)',
+              color: m.type === '简历' ? 'var(--info)' : m.type === '话术' ? 'var(--purple)' : m.type === '项目稿' ? 'var(--success)' : m.type === 'CL' ? 'var(--warning)' : 'var(--ink-muted)',
+            }}>
+              {m.format}
+            </div>
+            <div className="material-name">{m.name}</div>
+            <div className="material-meta" style={{marginBottom: 8}}>{m.type} · {m.size} · 更新于 {m.updated}</div>
+            {m.tag && <span className={`chip ${m.tag === '最新' ? 'chip-success' : m.tag === '高频' ? 'chip-info' : m.tag === '定制' ? 'chip-purple' : 'chip-muted'}`}>{m.tag}</span>}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+// ============ RESOURCES VIEW ============
+function ResourcesView({ data, setData }) {
+  const resources = data.resources || [];
+  const [filter, setFilter] = useState('全部');
+  const [addOpen, setAddOpen] = useState(false);
+
+  const categories = ['全部', ...new Set(resources.map(r => r.category))];
+  const filtered = filter === '全部' ? resources : resources.filter(r => r.category === filter);
+  const pinned = filtered.filter(r => r.pinned);
+  const others = filtered.filter(r => !r.pinned);
+
+  const togglePin = (id) => {
+    setData(d => ({ ...d, resources: (d.resources || []).map(r => r.id === id ? { ...r, pinned: !r.pinned } : r) }));
+  };
+
+  const deleteResource = (id) => {
+    if (!confirm('确定删除这个资源吗？')) return;
+    setData(d => ({ ...d, resources: (d.resources || []).filter(r => r.id !== id) }));
+  };
+
+  const addResource = (r) => {
+    setData(d => ({ ...d, resources: [...(d.resources || []), { ...r, id: 'r' + Date.now() }] }));
+    setAddOpen(false);
+  };
+
+  const ResourceCard = ({ r }) => (
+    <div style={{
+      background: 'var(--bg-elevated)',
+      border: '1px solid var(--line)',
+      borderRadius: 12,
+      padding: 18,
+      position: 'relative',
+      transition: 'all 0.15s ease',
+      display: 'flex',
+      flexDirection: 'column',
+      gap: 10,
+    }}
+    onMouseEnter={(e) => { e.currentTarget.style.borderColor = 'var(--ink)'; e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = 'var(--shadow)'; }}
+    onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'var(--line)'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}>
+      <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8}}>
+        <div style={{display: 'flex', gap: 6, flexWrap: 'wrap'}}>
+          <span className="chip chip-muted">{r.category}</span>
+          {r.tag && <span className={`chip ${r.tag === '必看' || r.tag === '权威' ? 'chip-danger' : r.tag === '每日更新' ? 'chip-success' : 'chip-info'}`}>{r.tag}</span>}
+        </div>
+        <div style={{display: 'flex', gap: 4}}>
+          <button className="btn btn-icon" style={{width: 26, height: 26, padding: 0, border: 'none', background: 'transparent', color: r.pinned ? 'var(--danger)' : 'var(--ink-muted)'}}
+            onClick={(e) => { e.stopPropagation(); togglePin(r.id); }} title={r.pinned ? '取消收藏' : '置顶收藏'}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill={r.pinned ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          </button>
+          <button className="btn btn-icon" style={{width: 26, height: 26, padding: 0, border: 'none', background: 'transparent', color: 'var(--ink-muted)'}}
+            onClick={(e) => { e.stopPropagation(); deleteResource(r.id); }} title="删除">
+            <Icon name="x" size={12}/>
+          </button>
+        </div>
+      </div>
+      <div>
+        <div style={{fontFamily: 'Fraunces, serif', fontSize: 17, fontWeight: 500, lineHeight: 1.3, marginBottom: 4}}>{r.name}</div>
+        <div style={{fontSize: 11, color: 'var(--ink-muted)', fontFamily: 'JetBrains Mono, monospace'}}>{r.platform}</div>
+      </div>
+      <div style={{fontSize: 12, color: 'var(--ink-soft)', lineHeight: 1.5, flex: 1}}>{r.description}</div>
+      <a href={r.url} target="_blank" rel="noopener" className="btn" style={{
+        display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none',
+        justifyContent: 'center', fontSize: 12, fontWeight: 500,
+        background: 'var(--ink)', color: 'var(--accent-ink)', borderColor: 'var(--ink)'
+      }}>
+        <Icon name="external" size={12}/> 跳转访问
+      </a>
+    </div>
+  );
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">Dashboard · 求职资源</div>
+          <h1 className="page-title">资源库</h1>
+        </div>
+        <div className="topbar-actions">
+          <button className="btn btn-primary" onClick={() => setAddOpen(true)}>
+            <Icon name="plus" size={13}/> 添加资源
+          </button>
+        </div>
+      </div>
+      <p className="page-sub">收藏优质第三方资源 · 27届实习汇总表、求职社区、招聘平台、内推渠道一键直达</p>
+
+      <div className="tabs">
+        {categories.map(c => (
+          <div key={c} className={`tab ${filter === c ? 'active' : ''}`} onClick={() => setFilter(c)}>
+            {c} <span style={{fontSize: 10, color: 'var(--ink-muted)', fontWeight: 500}}>
+              {c === '全部' ? resources.length : resources.filter(r => r.category === c).length}
+            </span>
+          </div>
+        ))}
+      </div>
+
+      {pinned.length > 0 && (
+        <>
+          <div style={{fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, color: 'var(--ink-muted)', fontWeight: 600, margin: '20px 0 12px', display: 'flex', alignItems: 'center', gap: 6}}>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            置顶收藏
+          </div>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14, marginBottom: 28}}>
+            {pinned.map(r => <ResourceCard key={r.id} r={r}/>)}
+          </div>
+        </>
+      )}
+
+      {others.length > 0 && (
+        <>
+          {pinned.length > 0 && (
+            <div style={{fontSize: 11, textTransform: 'uppercase', letterSpacing: 2, color: 'var(--ink-muted)', fontWeight: 600, margin: '0 0 12px'}}>
+              全部资源
+            </div>
+          )}
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 14}}>
+            {others.map(r => <ResourceCard key={r.id} r={r}/>)}
+          </div>
+        </>
+      )}
+
+      {filtered.length === 0 && (
+        <div className="empty">
+          <div className="empty-title">该分类下暂无资源</div>
+          <div>点击右上角"添加资源"开始收藏</div>
+        </div>
+      )}
+
+      {addOpen && <AddResourceModal onClose={() => setAddOpen(false)} onAdd={addResource}/>}
+    </>
+  );
+}
+
+function AddResourceModal({ onClose, onAdd }) {
+  const [form, setForm] = useState({
+    name: '',
+    url: '',
+    category: '实习汇总',
+    platform: '',
+    description: '',
+    tag: '',
+    pinned: false,
+  });
+  const CATEGORIES = ['实习汇总', '求职社区', '招聘平台', '笔试/面试准备', '垂直社区', '其他'];
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} style={{maxWidth: 560}}>
+        <div className="modal-head">
+          <div className="modal-title">添加资源</div>
+          <button className="modal-close" onClick={onClose}><Icon name="x" size={14}/></button>
+        </div>
+        <div className="modal-body">
+          <div className="form-row">
+            <div className="form-full">
+              <label>资源名称</label>
+              <input type="text" value={form.name} placeholder="如：27届实习汇总文档" onChange={(e) => setForm({...form, name: e.target.value})}/>
+            </div>
+            <div className="form-full">
+              <label>链接 URL</label>
+              <input type="text" value={form.url} placeholder="https://..." onChange={(e) => setForm({...form, url: e.target.value})}/>
+            </div>
+            <div>
+              <label>分类</label>
+              <select value={form.category} onChange={(e) => setForm({...form, category: e.target.value})}>
+                {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label>平台/域名</label>
+              <input type="text" value={form.platform} placeholder="如：nowcoder.com" onChange={(e) => setForm({...form, platform: e.target.value})}/>
+            </div>
+            <div>
+              <label>标签（可选）</label>
+              <input type="text" value={form.tag} placeholder="如：每日更新 / 必看" onChange={(e) => setForm({...form, tag: e.target.value})}/>
+            </div>
+            <div>
+              <label>是否置顶</label>
+              <select value={form.pinned ? 'yes' : 'no'} onChange={(e) => setForm({...form, pinned: e.target.value === 'yes'})}>
+                <option value="no">不置顶</option>
+                <option value="yes">置顶收藏</option>
+              </select>
+            </div>
+            <div className="form-full">
+              <label>描述</label>
+              <textarea value={form.description} placeholder="简要说明这个资源的用途..." onChange={(e) => setForm({...form, description: e.target.value})}/>
+            </div>
+          </div>
+        </div>
+        <div className="modal-foot">
+          <button className="btn" onClick={onClose}>取消</button>
+          <button className="btn btn-primary" onClick={() => {
+            if (!form.name.trim() || !form.url.trim()) { alert('请填写资源名称和链接'); return; }
+            onAdd(form);
+          }}>添加</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============ ANALYTICS VIEW ============
+function AnalyticsView({ data }) {
+  const funnel = useMemo(() => {
+    const total = data.applications.length;
+    const applied = data.applications.filter(a => !['wishlist'].includes(a.stage)).length;
+    const tested = data.applications.filter(a => ['test','interview','result'].includes(a.stage)).length;
+    const interviewed = data.applications.filter(a => ['interview','result'].includes(a.stage)).length;
+    const offers = data.applications.filter(a => a.result === 'offer').length;
+
+    const max = Math.max(total, 1);
+    return [
+      { name: '已投递', count: applied, color: '#2a4a6a', width: applied / max },
+      { name: '进入笔试', count: tested, color: '#5a3a7a', width: tested / max },
+      { name: '进入面试', count: interviewed, color: '#8a5a1a', width: interviewed / max },
+      { name: 'Offer', count: offers, color: '#2d5a3d', width: offers / max },
+    ];
+  }, [data.applications]);
+
+  const byCompany = useMemo(() => {
+    const map = {};
+    data.applications.forEach(a => {
+      const c = data.companies.find(cc => cc.id === a.companyId);
+      if (!c) return;
+      if (!map[c.id]) map[c.id] = { company: c, total: 0, interview: 0, offer: 0 };
+      map[c.id].total++;
+      if (a.stage === 'interview') map[c.id].interview++;
+      if (a.result === 'offer') map[c.id].offer++;
+    });
+    return Object.values(map);
+  }, [data]);
+
+  return (
+    <>
+      <div className="topbar">
+        <div>
+          <div className="crumb">Dashboard · 数据洞察</div>
+          <h1 className="page-title">转化分析</h1>
+        </div>
+      </div>
+      <p className="page-sub">定位求职漏斗中的瓶颈 · 优化材料投递策略 · 数据驱动下一步动作</p>
+
+      <div className="funnel-container" style={{marginBottom: 20}}>
+        <h3 className="section-title" style={{marginBottom: 20}}>申请转化漏斗</h3>
+        <div className="funnel">
+          {funnel.map((stage, i) => {
+            const prevCount = i > 0 ? funnel[i-1].count : stage.count;
+            const rate = prevCount > 0 ? Math.round(stage.count / prevCount * 100) : 0;
+            return (
+              <div key={stage.name} className="funnel-stage">
+                <div className="funnel-info">
+                  <div className="funnel-stage-name">{stage.name}</div>
+                  <div className="funnel-rate">{stage.count} 个 {i > 0 ? `· 转化率 ${rate}%` : ''}</div>
+                </div>
+                <div className="funnel-bar" style={{
+                  width: `${Math.max(stage.width * 100, 15)}%`,
+                  background: stage.color
+                }}>
+                  {stage.count}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div style={{marginTop: 20, padding: 14, background: 'var(--info-bg)', color: 'var(--info)', borderRadius: 8, fontSize: 12, lineHeight: 1.6}}>
+          💡 <strong>数据洞察：</strong>投递 → 笔试转化率{funnel[0].count > 0 ? ` ${Math.round(funnel[1].count / funnel[0].count * 100)}%` : ''}，面试 → Offer 转化率{funnel[2].count > 0 ? ` ${Math.round(funnel[3].count / funnel[2].count * 100)}%` : ''}。若某环节转化明显偏低，建议针对性复盘该阶段材料或准备策略。
+        </div>
+      </div>
+
+      <div className="funnel-container">
+        <h3 className="section-title" style={{marginBottom: 20}}>公司分布</h3>
+        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12}}>
+          {byCompany.map(item => (
+            <div key={item.company.id} style={{border: '1px solid var(--line)', borderRadius: 8, padding: 14, background: 'var(--bg-elevated)'}}>
+              <div style={{display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8}}>
+                <div className="company-logo" style={{background: item.company.color, width: 24, height: 24, fontSize: 11}}>{item.company.logo}</div>
+                <div style={{fontWeight: 600, fontSize: 13}}>{item.company.name}</div>
+              </div>
+              <div style={{display: 'flex', gap: 8, fontSize: 11}}>
+                <span className="chip chip-muted">投 {item.total}</span>
+                {item.interview > 0 && <span className="chip chip-warn">面 {item.interview}</span>}
+                {item.offer > 0 && <span className="chip chip-success">Offer {item.offer}</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ============ APP DETAIL MODAL ============
+function AppDetailModal({ app, data, onClose, onUpdate, onDelete }) {
+  const company = data.companies.find(c => c.id === app.companyId);
+  const [local, setLocal] = useState(app);
+  const progressKeys = ['resume','oa','hr','tech','final'];
+  const progressLabels = {resume:'简历初筛',oa:'笔试/OA',hr:'HR 面',tech:'业务面/一面',final:'终面'};
+
+  const toggleProgress = (k) => {
+    const newProgress = { ...local.progress, [k]: !local.progress[k] };
+    setLocal({...local, progress: newProgress});
+    onUpdate({ progress: newProgress });
+  };
+
+  const changeStage = (stage) => {
+    setLocal({...local, stage});
+    onUpdate({ stage });
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <div className="modal-head">
+          <div className="modal-head-content">
+            <div className="company-logo" style={{background: company.color, width: 36, height: 36, fontSize: 14}}>{company.logo}</div>
+            <div>
+              <div style={{fontSize: 11, color: 'var(--ink-muted)', fontWeight: 500}}>{company.name} · {local.location}</div>
+              <div className="modal-title">{local.role}</div>
+            </div>
+          </div>
+          <button className="modal-close" onClick={onClose}><Icon name="x" size={14}/></button>
+        </div>
+        <div className="modal-body">
+          <div className="form-row">
+            <div>
+              <label>当前阶段</label>
+              <select value={local.stage} onChange={(e) => changeStage(e.target.value)}>
+                {STAGES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label>截止日期</label>
+              <input type="date" value={local.deadline} onChange={(e) => { setLocal({...local, deadline: e.target.value}); onUpdate({deadline: e.target.value}); }}/>
+            </div>
+            <div>
+              <label>薪资范围</label>
+              <input type="text" value={local.salary} onChange={(e) => { setLocal({...local, salary: e.target.value}); onUpdate({salary: e.target.value}); }}/>
+            </div>
+            <div>
+              <label>优先级</label>
+              <select value={local.priority} onChange={(e) => { setLocal({...local, priority: e.target.value}); onUpdate({priority: e.target.value}); }}>
+                <option value="high">高优先级</option>
+                <option value="medium">中等</option>
+                <option value="low">低优先级</option>
+              </select>
+            </div>
+          </div>
+
+          <label>流程进度</label>
+          <div style={{display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap'}}>
+            {progressKeys.map(k => (
+              <div key={k}
+                onClick={() => toggleProgress(k)}
+                style={{
+                  flex: 1, minWidth: 100,
+                  padding: '12px 10px', borderRadius: 8,
+                  border: '1px solid ' + (local.progress[k] ? 'var(--ink)' : 'var(--line)'),
+                  background: local.progress[k] ? 'var(--ink)' : 'var(--bg-card)',
+                  color: local.progress[k] ? 'white' : 'var(--ink-soft)',
+                  cursor: 'pointer', textAlign: 'center',
+                  transition: 'all 0.15s ease'
+                }}>
+                <div style={{fontSize: 11, marginBottom: 4, opacity: 0.7, fontWeight: 500}}>{k.toUpperCase()}</div>
+                <div style={{fontWeight: 600, fontSize: 12}}>{progressLabels[k]}</div>
+                {local.progress[k] && <div style={{marginTop: 4}}><Icon name="check" size={12}/></div>}
+              </div>
+            ))}
+          </div>
+
+          <label>备注 / 内推信息 / 岗位要点</label>
+          <textarea value={local.notes || ''} placeholder="如联系人、JD 关键信息、岗位亮点、准备要点..." onChange={(e) => { setLocal({...local, notes: e.target.value}); onUpdate({notes: e.target.value}); }}/>
+
+          <div style={{marginTop: 16}}>
+            <label>Job Description（JD 正文）</label>
+            <textarea value={local.jd || ''} placeholder="粘贴完整的岗位描述，方便后续面试准备和对照学习..." style={{minHeight: 140}} onChange={(e) => { setLocal({...local, jd: e.target.value}); onUpdate({jd: e.target.value}); }}/>
+          </div>
+
+          <div style={{marginTop: 20, padding: 14, background: 'var(--bg-card)', borderRadius: 8, border: '1px solid var(--line)'}}>
+            <div style={{fontSize: 10, textTransform: 'uppercase', letterSpacing: 1.5, color: 'var(--ink-muted)', fontWeight: 600, marginBottom: 6}}>{company.name} 投递规则</div>
+            <div style={{fontSize: 12, color: 'var(--ink-soft)', lineHeight: 1.5}}>{company.rule}</div>
+          </div>
+        </div>
+        <div className="modal-foot">
+          <button className="btn" style={{color: 'var(--danger)'}} onClick={() => { if (confirm('确定删除？')) onDelete(); }}>删除申请</button>
+          <button className="btn btn-primary" onClick={onClose}>完成</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============ ADD APP MODAL ============
+function AddAppModal({ data, onClose, onAdd }) {
+  const [form, setForm] = useState({
+    companyId: data.companies[0]?.id || '',
+    role: '',
+    roleType: '产品',
+    jobType: '暑期实习',
+    location: '',
+    salary: '',
+    applyDate: new Date().toISOString().slice(0,10),
+    deadline: new Date(Date.now() + 14 * 86400000).toISOString().slice(0,10),
+    stage: 'applied',
+    priority: 'medium',
+    link: '',
+    referralCode: '',
+    notes: '',
+    progress: { resume: true, oa: false, hr: false, tech: false, final: false },
+  });
+
+  const ROLE_TYPES = ['产品', '数据分析', '商业分析', '数据产品', '算法', '用户研究', '增长 / 策略', '运营', '技术', '其他'];
+  const JOB_TYPES = ['暑期实习', '日常实习', '校招', '社招'];
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()} style={{maxWidth: 720}}>
+        <div className="modal-head">
+          <div className="modal-title">添加投递</div>
+          <button className="modal-close" onClick={onClose}><Icon name="x" size={14}/></button>
+        </div>
+        <div className="modal-body">
+          <div className="form-row">
+            <div>
+              <label>公司</label>
+              <select value={form.companyId} onChange={(e) => setForm({...form, companyId: e.target.value})}>
+                {data.companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label>工作地点</label>
+              <input type="text" value={form.location} placeholder="如：上海" onChange={(e) => setForm({...form, location: e.target.value})}/>
+            </div>
+            <div className="form-full">
+              <label>岗位名称</label>
+              <input type="text" value={form.role} placeholder="如：数据分析师 - 广告业务" onChange={(e) => setForm({...form, role: e.target.value})}/>
+            </div>
+            <div>
+              <label>岗位类型</label>
+              <select value={form.roleType} onChange={(e) => setForm({...form, roleType: e.target.value})}>
+                {ROLE_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div>
+              <label>招聘类型</label>
+              <select value={form.jobType} onChange={(e) => setForm({...form, jobType: e.target.value})}>
+                {JOB_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+              </select>
+            </div>
+            <div>
+              <label>薪资</label>
+              <input type="text" value={form.salary} placeholder="如：25-35K" onChange={(e) => setForm({...form, salary: e.target.value})}/>
+            </div>
+            <div>
+              <label>当前阶段</label>
+              <select value={form.stage} onChange={(e) => setForm({...form, stage: e.target.value})}>
+                {STAGES.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label>投递日期</label>
+              <input type="date" value={form.applyDate} onChange={(e) => setForm({...form, applyDate: e.target.value})}/>
+            </div>
+            <div>
+              <label>截止日期</label>
+              <input type="date" value={form.deadline} onChange={(e) => setForm({...form, deadline: e.target.value})}/>
+            </div>
+            <div>
+              <label>投递链接</label>
+              <input type="text" value={form.link} placeholder="https://..." onChange={(e) => setForm({...form, link: e.target.value})}/>
+            </div>
+            <div>
+              <label>内推码</label>
+              <input type="text" value={form.referralCode} placeholder="选填" onChange={(e) => setForm({...form, referralCode: e.target.value})}/>
+            </div>
+            <div>
+              <label>优先级</label>
+              <select value={form.priority} onChange={(e) => setForm({...form, priority: e.target.value})}>
+                <option value="high">高</option>
+                <option value="medium">中</option>
+                <option value="low">低</option>
+              </select>
+            </div>
+            <div className="form-full">
+              <label>备注</label>
+              <textarea value={form.notes} placeholder="内推人、JD 要点等..." onChange={(e) => setForm({...form, notes: e.target.value})}/>
+            </div>
+          </div>
+        </div>
+        <div className="modal-foot">
+          <button className="btn" onClick={onClose}>取消</button>
+          <button className="btn btn-primary" onClick={() => {
+            if (!form.role.trim()) { alert('请填写岗位名称'); return; }
+            onAdd(form);
+          }}>添加</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
